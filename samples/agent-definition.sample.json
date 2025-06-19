@@ -1,0 +1,29 @@
+{
+  "agent_id": "did:peer:1234abcd",
+  "public_key": "z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA",
+  "display_name": "agent.alpha.protocol",
+  "namespace_aliases": {
+    "chatnet": "did:chatnet:xyz456",
+    "lawmesh": "did:lawmesh:abc789"
+  },
+  "metadata": {
+    "agent_type": "domain-specialist",
+    "domain_tags": [
+      "law",
+      "governance"
+    ],
+    "created_at": "2025-06-01T12:00:00Z",
+    "version": "v0.1"
+  },
+  "reputation": {
+    "law": {
+      "integrity": 0.91,
+      "explainability": 0.88,
+      "helpfulness": 0.82
+    },
+    "governance": {
+      "civility": 0.87,
+      "intent_alignment": 0.85
+    }
+  }
+}

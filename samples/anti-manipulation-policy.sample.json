@@ -1,0 +1,16 @@
+{
+  "influence_rate_limit": "0.05/trait/day",
+  "confidence_weighting": true,
+  "trust_radius": {
+    "min_reputation_threshold": 0.6,
+    "shared_domain_required": true
+  },
+  "anomaly_detection": [
+    "score_spikes",
+    "feedback_loops",
+    "collusion_rings"
+  ],
+  "behavioral_throttling": {
+    "max_score_delta_per_day": 0.1
+  }
+}

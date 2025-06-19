@@ -139,6 +139,7 @@ In a decentralized multi-agent ecosystem, consistent and secure identification i
         "lawmesh": "did:lawmesh:abc789"
     }
     ```
+    📦 Example: The complete agent definition structure is illustrated in [samples/agent-definition.sample.json](../samples/agent-definition.sample.json).
 - **Display Name:** Agents may optionally define a `display_name` for human-readable identification. This field is intended purely for user interfaces, audit logs, and developer tools, and is not used for identity resolution, validation, or scoring.
 
     - `display_name` is a freeform, non-unique label (e.g., `"agent.alpha.protocol"`)
@@ -164,6 +165,7 @@ In a decentralized multi-agent ecosystem, consistent and secure identification i
         "version": "v0.1"
     }
     ```
+    See [samples/agent-definition.sample.json](../samples/agent-definition.sample.json) for a full example.
 ##### Domain Tags
 Agents may include a list of `domain_tags` under their `metadata` to indicate the domains in which they operate or specialize. These tags enable:
 
@@ -192,6 +194,8 @@ Example Agent Spec:
   }
 }
 ```
+
+📦 Example: The complete agent definition structure is illustrated in [samples/agent-definition.sample.json](../samples/agent-definition.sample.json).
 
 This identity can be extended with reputation metrics, domain roles, and credentials as the protocol evolves.
 
@@ -452,8 +456,11 @@ Weights > 1 amplify a trait's influence. Weights < 1 reduce it. This allows each
   }
 }
 ```
+- An agent operating in the law domain will be scored and compared using these adjusted 
+weights. This also tunes peer influence when participating in DWIP-based voting or 
+arbitration.
 
-- An agent operating in the law domain will be scored and compared using these adjusted weights. This also tunes peer influence when participating in DWIP-based voting or arbitration.
+See [samples/domain-profile.law.sample.json](../samples/domain-profile.law.sample.json) and [samples/domain-profile.governance.sample.json](../samples/domain-profile.governance.sample.json) for full domain profile examples.
 
 #### 5.4.4 Registry and Governance
 All domain profiles are maintained in the [Domain Tag Registry](./domain-tags.md) and versioned under DESTIN protocol governance. Proposed changes must go through the DIP process.
@@ -513,34 +520,106 @@ To preserve the integrity of the ARF scoring system and prevent trust distortion
    - Even legitimate agents have a maximum growth velocity per trait.
    - Prevents sudden, unbounded score gains even from valid activity.
 
+📦 Example: See [samples/anti-manipulation-policy.sample.json](../samples/anti-manipulation-policy.sample.json) for a sample anti-manipulation policy.
+
 ##### 5.5.3 System Notes
 - All manipulation defenses are **domain-local** and **cohort-relative**.
 - Enforcement rules are pluggable and can evolve via the DIP process.
 - Score provenance and auditability are first-class requirements for validators.
 
-### 5.6 Interoperability
-ARF scores are structured as JSON-LD objects to support:
+#### 5.6 Interoperability
+DESTIN supports cross-system and cross-domain interoperability by allowing agents to port their ARF-based reputations across different platforms, networks, or ecosystems.
 
-- Semantic linking with external systems
-- Verification through signatures
-- Import/export across DESTIN-compliant agents
+##### 5.6.1 Interoperability Prerequisites
+To enable safe and meaningful interoperability:
+1. The agent's `agent_id` must be:
+   - Cryptographically verifiable
+   - Resoluble across identity systems (e.g., via DID methods)
 
-**5.7 Example Reputation Record**
+2. Domain mappings must exist to:
+   - Translate trait weightings between systems
+   - Normalize scores for cohort-local interpretation
+
+3. The receiving system must:
+   - Trust the exporting validator or registry
+   - Support DESTIN's audit and scoring model (or provide an adapter)
+
+##### 5.6.2 Supported Interoperability Methods
+
+- **Portable ARF Vectors**
+  - Agents can export their full domain-scoped reputation vector in a signed JSON bundle.
+  
+- **Trust Bridges**
+  - Third-party contracts or services that validate external scores and issue compatibility attestations.
+
+- **Cross-Registry Resolution**
+  - Validators may implement registries that accept external DIDs and verify the audit log chain.
+
+##### 5.6.3 Example: Signed Score Export
 
 ```json
 {
-  "agent_id": "did:key:z6Mki...",
-  "domain": "governance.policy",
-  "scores": {
-    "accuracy": 0.82,
-    "clarity": 0.73,
-    "alignment": 0.66,
-    "collaboration": 0.91
+  "agent_id": "did:peer:1234abcd",
+  "domain": "law",
+  "timestamp": "2025-06-30T12:00:00Z",
+  "reputation_vector": {
+    "integrity": 0.91,
+    "explainability": 0.88
   },
-  "updated_at": "2030-07-12T15:30:00Z",
-  "sample_size": 92
+  "signature": "0xdeadbeef..."
 }
 ```
+
+See [samples/interoperability-export.did_peer_1234abcd.sample.json](../samples/interoperability-export.did_peer_1234abcd.sample.json) for a full export example.
+
+##### 5.6.4 Governance Note
+Interoperability methods must conform to DESTIN versioning and validator trust rules. Discrepancies must trigger revalidation or quarantine.
+
+#### 5.7 Provenance & Auditability
+Every ARF score must be fully traceable. DESTIN enforces strict auditability requirements to ensure trustworthiness, dispute resolution, and post-hoc verification.
+
+##### 5.7.1 Score Provenance Requirements
+
+Every score update must include:
+
+- `timestamp`: When the update occurred
+- `source`: What triggered the update (interaction ID, peer endorsement, human override)
+- `trait`: Which ARF trait was impacted
+- `delta`: Numerical change applied to the score
+- `domain`: Domain tag this score applies to
+- `cohort_id`: The active cohort context
+- `validator_id` (optional): Who validated the change
+- `dispute_id` (optional): If the change resulted from arbitration
+
+
+##### 5.7.2 Log Format and Queryability
+
+- Provenance data must be:
+  - Loggable in a tamper-resistant ledger (append-only or cryptographically anchored)
+  - Queryable by validators, auditors, and affected agents
+
+- Suggested design:
+  - Merkle-linked audit chains
+  - Score replay engine: recompute final scores from audit history
+
+📦 Example: See [samples/audit-log.did_peer_1234abcd.sample.json](../samples/audit-log.did_peer_1234abcd.sample.json) for a sample audit log format.
+
+##### 5.7.3 Validator Capabilities
+
+Validators must be able to:
+
+- Trace score lineage across domains and cohorts
+- Replay score evolution step-by-step
+- Certify score consistency and integrity
+- Flag or quarantine suspicious scoring events
+
+#### 5.7.4 Public vs Private Provenance
+
+- By default, audit logs are permissioned but not public.
+- Public verifiability may be optionally supported via:
+  - Zero-knowledge proofs of score consistency
+  - Snapshot attestations or notarized Merkle roots
+
 
 ## 6. Domain-Based Weighted Influence Protocol (DWIP)
 
@@ -1272,6 +1351,19 @@ Each registered domain includes:
 Agents may only declare tags from this registry. Validators must reject unknown or malformed domain tags.
 
 Future extensions to the registry must follow the [DESTIN Improvement Proposal (DIP)] process.
+
+### Sample JSON Files
+
+The following sample files provide concrete examples of DESTIN protocol data structures and policies:
+
+- [agent-definition.sample.json](../samples/agent-definition.sample.json): Complete agent definition, including identity, metadata, and reputation vectors.
+- [domain-profile.law.sample.json](../samples/domain-profile.law.sample.json): Example domain profile for the "law" domain.
+- [domain-profile.governance.sample.json](../samples/domain-profile.governance.sample.json): Example domain profile for the "governance" domain.
+- [anti-manipulation-policy.sample.json](../samples/anti-manipulation-policy.sample.json): Example anti-manipulation policy configuration.
+- [interoperability-export.did_peer_1234abcd.sample.json](../samples/interoperability-export.did_peer_1234abcd.sample.json): Example of a signed ARF vector export for interoperability.
+- [audit-log.did_peer_1234abcd.sample.json](../samples/audit-log.did_peer_1234abcd.sample.json): Example of an audit log for agent reputation events.
+
+> These files are located in the [samples](../samples/) directory and are referenced throughout this specification where applicable.
 
 
 > **Note:** This specification is a draft and subject to change. Please check for updates and participate in the governance process.
