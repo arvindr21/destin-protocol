@@ -86,3 +86,5 @@ coverage/
 
 # Optional: ignore build output
 /dist/ 
+
+notes.txt

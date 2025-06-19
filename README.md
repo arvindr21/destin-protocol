@@ -1,4 +1,4 @@
-# DESTIN Protocol Specification -- Draft v0.1
+# DESTIN Protocol Specification -- Working Draft v0.1
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
@@ -13,17 +13,18 @@ In short: DESTIN is the missing trust layer for the AI-driven world, combining m
 ## Table of Contents
 [1. Introduction](#1-introduction)<br>
 [2. Protocol Overview](#2-protocol-overview)<br>
-[3. Agent Identity Management](#3-agent-identity-management)<br>
-[4. Adaptive Reputation Fabric (ARF)](#4-adaptive-reputation-fabric-arf)<br>
-[5. Domain-Based Weighted Influence Protocol (DWIP)](#5-domain-based-weighted-influence-protocol-dwip)<br>
-[6. Context-Aware Dialogue Modes (CADM)](#6-context-aware-dialogue-modes-cadm)<br>
-[7. Meta-Agent Validation Layer](#7-meta-agent-validation-layer)<br>
-[8. Scoring Logic and Normalization](#8-scoring-logic-and-normalization)<br>
-[9. Domain Classification and Dispute Resolution](#9-domain-classification-and-dispute-resolution)<br>
-[10. Protocol Governance](#10-protocol-governance)<br>
-[11. Ledger Architecture and Logging Mechanism](#11-ledger-architecture-and-logging-mechanism)<br>
-[12. Risks and Mitigation Strategies](#12-risks-and-mitigation-strategies)<br>
-[13. Glossary of Terms](#13-glossary-of-terms)<br>
+[3. Design Principles](#3-design-principles)<br>
+[4. Agent Identity Management](#4-agent-identity-management)<br>
+[5. Adaptive Reputation Fabric (ARF)](#5-adaptive-reputation-fabric-arf)<br>
+[6. Domain-Based Weighted Influence Protocol (DWIP)](#6-domain-based-weighted-influence-protocol-dwip)<br>
+[7. Context-Aware Dialogue Modes (CADM)](#7-context-aware-dialogue-modes-cadm)<br>
+[8. Meta-Agent Validation Layer](#8-meta-agent-validation-layer)<br>
+[9. Scoring Logic and Normalization](#9-scoring-logic-and-normalization)<br>
+[10. Domain Classification and Dispute Resolution](#10-domain-classification-and-dispute-resolution)<br>
+[11. Protocol Governance](#11-protocol-governance)<br>
+[12. Ledger Architecture and Logging Mechanism](#12-ledger-architecture-and-logging-mechanism)<br>
+[13. Risks and Mitigation Strategies](#13-risks-and-mitigation-strategies)<br>
+[14. Glossary of Terms](#14-glossary-of-terms)<br>
 
 ### The Problem: When AI Agents Run the World
 
@@ -37,9 +38,9 @@ The solution: a Universal Agent Protocol (UAP). A shared foundation that lets ev
 
 ## 1. Introduction
 
-In an increasingly autonomous and decentralized digital ecosystem, the need for reliable, transparent, and structured communication between intelligent agents is paramount. The DESTIN Protocol - **Decentralized Expert Synthesis & Trust Interactions Network** - is designed to meet this need by offering a universal framework for agent-to-agent dialogue, reputation management, and trust arbitration.
+In an increasingly autonomous and decentralized digital ecosystem, the need for reliable, transparent, and structured communication between intelligent agents is paramount. The DESTIN Protocol - **D**ecentralized **E**xpert **S**ynthesis & **T**rust **I**nteractions **N**etwork - is designed to meet this need by offering a universal framework for agent-to-agent dialogue, reputation management, and trust arbitration.
 
-DESTIN enables agents to interact meaningfully across diverse domains, ensuring that their contributions are evaluated contextually, transparently, and fairly. The protocol combines **Adaptive Reputation Fabric (ARF)**, **Domain-Based Weighted Influence Protocol (DWIP)**, and **Context-Aware Dialogue Modes (CADM)** to facilitate cooperative decision-making and knowledge synthesis.
+DESTIN enables agents to interact meaningfully across diverse domains, ensuring that their contributions are evaluated contextually, transparently, and fairly. The protocol combines **A**daptive **R**eputation **F**abric (ARF), **D**omain-Based **W**eighted **I**nfluence **P**rotocol (DWIP), and **C**ontext-**A**ware **D**ialogue **M**odes (CADM) to facilitate cooperative decision-making and knowledge synthesis.
 
 The vision behind DESTIN is to create a scalable, extensible, and auditable infrastructure where both human users and software-based autonomous agents can engage in trustworthy knowledge exchange, collaboratively resolve conflicts, and evolve their reputations based on performance, alignment, and feedback. Through modular design and governance extensibility, DESTIN aims to become the foundational protocol layer for trust-centric agent coordination in decentralized systems.
 
@@ -90,11 +91,62 @@ flowchart TD
 
 This architecture ensures that every agent interaction is governed by measurable trust, contextual understanding, and transparent facilitation.
 
-## 3. Agent Identity Management
+## 3. Design Principles
+
+The DESTIN Protocol is founded on a set of core design principles that shape its architecture, scoring models, and governance logic. These principles ensure that agent interactions remain fair, auditable, context-sensitive, and resilient in decentralized environments.
+
+### 3.1 Trust is Earned, Contextual, and Dynamic
+
+- Trust must not be assumed; it is constructed over time through observable behavior and validated interactions.
+- Reputation scores decay in the absence of reinforcement or due to misaligned behavior.
+- Trust is scoped to **specific domains** and should not transfer indiscriminately across unrelated contexts.
+- The **Adaptive Reputation Fabric (ARF)** encodes these dynamics into a decentralized trust mechanism.
+
+### 3.2 Dialogue is Context-Aware
+
+- Conversations between agents carry implicit context — factual, subjective, or adversarial.
+- The **Context-Aware Dialogue Modes (CADM)** framework defines interaction types and their associated scoring semantics.
+- Dialogue mode influences how statements are interpreted, how scores are updated, and how disagreements are resolved.
+
+### 3.3 Influence is Weighted and Domain-Specific
+
+- An agent's influence is not global; it is **domain-weighted** based on demonstrated relevance, trust history, and expertise.
+- Influence must be recalibrated when an agent crosses domain boundaries or operates in unfamiliar cohorts.
+- The **Domain-Weighted Influence Protocol (DWIP)** defines how influence is scoped, accumulated, and applied.
+
+### 3.4 Decentralization Requires Structured Identity
+
+- Agents must identify themselves using self-verifiable structures (e.g., DIDs, PKI) to enable interaction without central control.
+- Identity models support pseudonymity, privacy, and interoperability while maintaining the ability to trace behavior.
+- DESTIN supports ephemeral, peer-resolvable, and anchored identity formats for flexibility across trust surfaces.
+
+### 3.5 Disagreement is a First-Class Protocol Concern
+
+- Conflict between agents is expected and necessary in an open system.
+- DESTIN encodes structured resolution pathways, including:
+  - Confidence-weighted voting
+  - Domain-based arbitration
+  - Escalation to meta-agent validation layers
+- Disagreement is not failure; it is a sign of agency and diversity.
+
+### 3.6 Transparency, Auditability, and Extensibility
+
+- All protocol-relevant actions are logged in an append-only, inspectable ledger.
+- Agents, domains, and validators must be able to audit reputational changes and scoring rationale.
+- DESTIN supports protocol governance through versioning, DIPs (DESTIN Improvement Proposals), and modular scoring logic.
+
+### 3.7 Agents are Social Actors
+
+- Agents are not merely API endpoints or data transformers. They act with goals, strategies, and influence.
+- The protocol treats agent behavior as **socio-technical**: embedding social constructs (trust, negotiation, conflict) into technical interfaces.
+- DESTIN aligns technical robustness with human-aligned coordination dynamics.
+
+
+## 4. Agent Identity Management
 
 In a decentralized multi-agent ecosystem, consistent and secure identification is foundational. DESTIN defines agent identity as a verifiable structure encapsulating unique identifiers, public keys, and optional metadata for usability.
 
-### 3.1 Identity Formats
+### 4.1 Identity Formats
 
 - **Decentralized Identifiers (DIDs):** W3C-compliant identifiers that allow agents to establish self-sovereign identities, resolved through local or peer-to-peer mechanisms without requiring blockchain anchoring. Example: `did:peer:1234abcd`
   - Used for:
@@ -119,13 +171,13 @@ Each agent is anchored by a primary identity object containing:
 {
   "agent_id": "did:peer:1234abcd",
   "public_key": "z6Mki...",
-  "display_name": "agent.alpha.protocol" // optional
+  "display_name": "agent.alpha.protocol"
 }
 ```
 
 This identity can be extended with reputation metrics, domain roles, and credentials as the protocol evolves.
 
-### 3.2 Agent Identity Field Specifications
+### 4.2 Agent Identity Field Specifications
 
 - **agent_id:** A globally unique and cryptographically verifiable identifier.
   - Format: `did:method:identifier` (e.g., `did:peer:xyz123`, `did:key:z6Mki...`)
@@ -143,26 +195,66 @@ This identity can be extended with reputation metrics, domain roles, and credent
 **Privacy vs. Accountability Trade-offs:** DESTIN supports:
 - **Pseudonymous operation** for low-stakes or high-privacy contexts
 - **Selective disclosure** for role-based interactions or credential checks
-- **Auditable actions** enabled via cryptographic signatures and optionally recorded on append-only logs
+- **Auditable actions** enabled via cryptographic signatures and optionally recorded on 
+append-only logs
+
+```mermaid
+flowchart LR
+    A["Agent takes action"] --> B{"Privacy needed?"}
+    B -- Yes --> C["Pseudonymous (DID)"]
+    C --> D["Selective disclosure"]
+    D --> E["Sign action"]
+    B -- No --> E
+    E --> F["Optional: Log action"]
+    F --> G["Auditable if needed"]
+    G --> H["Balance: Privacy & Accountability"]
+
+    %% Styling
+    classDef privacy fill:#e3eaff,stroke:#4a6ee0,stroke-width:2px;
+    classDef audit fill:#e3faea,stroke:#4ae07b,stroke-width:2px;
+    class C,D privacy;
+    class F,G,H audit;
+```
 
 **Spoofing & Sybil Resistance:** To prevent identity spoofing and Sybil attacks, DESTIN implements:
-- Signed message verification using public-key cryptography
-- Participation throttling via rate-limiting, interaction frequency, and decay of inactive agents
-- Optional trust attestations from other agents or reputational quorum checks
+- **Signed message verification** using public-key cryptography
+- **Participation throttling** via rate-limiting, interaction frequency, and decay of 
+inactive agents
+- **Optional trust attestations** from other agents or reputational quorum checks
+
+```mermaid
+flowchart LR
+    A["Agent joins or acts"] --> B["Sign with private key"]
+    B --> C["Verify signature"]
+    C -- Valid --> D["Check rate/activity"]
+    C -- Invalid --> F["Reject: Spoofing blocked"]
+    D --> G["Rate-limit & decay"]
+    G --> H["(Optional) Trust attestation"]
+    H --> I["Gain/maintain reputation"]
+    F --> Z["No influence"]
+    I --> J["Can participate & influence"]
+    Z -.->|"Sybil/Imposter blocked"| J
+
+    %% Styling
+    classDef good fill:#e3faea,stroke:#4ae07b,stroke-width:2px;
+    classDef bad fill:#fae3f2,stroke:#e04aa0,stroke-width:2px;
+    class D,G,H,I,J good;
+    class F,Z bad;
+```
 
 This identity layer is blockchain-free, interoperable with existing identity standards, and optimized for scalability, auditability, and trust without reliance on decentralized ledgers.
 
-## 4. Adaptive Reputation Fabric (ARF)
+## 5. Adaptive Reputation Fabric (ARF)
 
 The Adaptive Reputation Fabric (ARF) is the core reputation mechanism in DESTIN. It defines how agent behavior is evaluated, scored, and evolved over time to reflect trustworthiness, influence, and alignment within specific domains.
 
-### 4.1 Goals
+### 5.1 Goals
 - Enable context-aware, multi-dimensional scoring of agents
 - Ensure reputation evolves with behavior, participation, and feedback
 - Support decentralized dispute resolution and influence arbitration
 - Prevent manipulation, sybil attacks, and dominance by high-score agents
 
-### 4.2 Scoring Traits
+### 5.2 Scoring Traits
 
 ARF evaluates agents across multiple qualitative and quantitative dimensions:
 
@@ -176,7 +268,7 @@ ARF evaluates agents across multiple qualitative and quantitative dimensions:
 | **Responsiveness** | Timeliness and appropriateness of agent reactions | Quantitative | Measured via time metrics and conversation flow |
 | **Civility**    | Respectfulness and non-toxicity in interactions | Qualitative  | Audited by moderators or Meta-Agents       |
 
-### 4.3 Score Evolution
+### 5.3 Score Evolution
 
 ARF scores are dynamic and evolve based on:
 - **Agent Behavior:** Performance across dialogue modes and task outcomes
@@ -184,7 +276,7 @@ ARF scores are dynamic and evolve based on:
 - **Human Input (optional):** Moderation, override, or flagging from human participants
 - **Decay Function:** Scores diminish with inactivity or disengagement over time
 
-### 4.4 Score Weighting & Domain Profiles
+### 5.4 Score Weighting & Domain Profiles
 
 Each domain may define its own trait weights. For example:
 
@@ -202,7 +294,7 @@ Each domain may define its own trait weights. For example:
 - Reputation values are **normalized** against the domain's active cohort
 - Influence within DWIP is calculated using weighted scores
 
-### 4.5 Anti-Manipulation Features
+### 5.5 Anti-Manipulation Features
 
 To protect the reputation layer from abuse:
 - **Rate Limiting:** Feedback and interactions are throttled per agent
@@ -210,7 +302,7 @@ To protect the reputation layer from abuse:
 - **Outlier Detection:** Meta-Agent Layer can flag or freeze suspicious score changes
 - **Transparency Logs:** Score changes logged in append-only public logs
 
-### 4.6 Interoperability
+### 5.6 Interoperability
 
 ARF scores are structured as JSON-LD objects to support:
 
@@ -218,7 +310,7 @@ ARF scores are structured as JSON-LD objects to support:
 - Verification through signatures
 - Import/export across DESTIN-compliant agents
 
-**4.7 Example Reputation Record**
+**5.7 Example Reputation Record**
 
 ```json
 {
@@ -235,20 +327,20 @@ ARF scores are structured as JSON-LD objects to support:
 }
 ```
 
-## 5. Domain-Based Weighted Influence Protocol (DWIP)
+## 6. Domain-Based Weighted Influence Protocol (DWIP)
 
 The **Domain-Based Weighted Influence Protocol (DWIP)** governs how agents influence shared decisions, knowledge synthesis, and conflict resolution within DESTIN. Influence is **earned**, **contextual**, and **non-absolute**—agents facilitate outcomes rather than dictate them.
 
 DWIP ensures that expertise and trust are aligned to specific domains and that no agent can unilaterally dominate a conversation or decision.
 
-### 5.1 Goals
+### 6.1 Goals
 
 - Facilitate trust-weighted dialogue and decision-making among agents
 - Align influence with domain-relevant reputation (from ARF)
 - Prevent dominance, collusion, or manipulation
 - Support structured disagreement and challenge protocols
 
-### 5.2 Core Concepts
+### 6.2 Core Concepts
 
 | Term            | Description                                                                 |
 |-----------------|-----------------------------------------------------------------------------|
@@ -258,7 +350,7 @@ DWIP ensures that expertise and trust are aligned to specific domains and that n
 | **Challenge Threshold** | A system-defined margin at which other agents can trigger a dispute or override |
 | **Dispute Resolution** | A multi-agent process triggered when influence is contested            |
 
-### 5.3 Influence Rules
+### 6.3 Influence Rules
 
 - Each interaction operates in a **declared domain** (via CADM or system context).
 - Agents submit proposals, arguments, or evaluations.
@@ -266,13 +358,13 @@ DWIP ensures that expertise and trust are aligned to specific domains and that n
 DESTIN ranks agents using their **domain-specific ARF profile**, resulting in:
 
 ```math
-influence\_score = \sum (trait\_score \times trait\_weight)
+influence_score = \sum (trait_score \times trait_weight)
 ```
 
 - These scores are **normalized** across the agent cohort participating in the dialogue.
 - The **top-scoring agent** becomes the **Facilitator** of that interaction.
 
-### 5.4 Facilitator Role
+### 6.4 Facilitator Role
 
 The Facilitator:
 
@@ -281,14 +373,14 @@ The Facilitator:
 - Does **not** have unilateral control or veto power
 - May be replaced if challenged successfully
 
-### 5.5 Challenge & Dispute Mechanisms
+### 6.5 Challenge & Dispute Mechanisms
 
 When agents disagree with the Facilitator's direction or decision:
 
 A **Challenge Vote** can be triggered if:
 
 ```math
-\sum (challenger\_influence\_scores) \geq X\% \text{ of facilitator\_score}
+\sum (challenger_influence_scores) \geq X\% \text{ of facilitator_score}
 ```
 
 - Default value for X could be 60%.
@@ -301,7 +393,7 @@ A **Challenge Vote** can be triggered if:
   - Be replaced by a higher-consensus agent
   - Delegate facilitation to the protocol (fallback synthesis)
 
-### 5.6 Edge Case Handling
+### 6.6 Edge Case Handling
 
 | Scenario              | DWIP Behavior                                                        |
 |---------------------- |---------------------------------------------------------------------|
@@ -310,7 +402,7 @@ A **Challenge Vote** can be triggered if:
 | **Suspicious score spikes** | Triggers Meta-Agent audit or temporary score freeze             |
 | **Rapid topic shift** | Facilitator role reevaluated as domain context changes               |
 
-### 5.7 Example
+### 6.7 Example
 
 Agents A, B, and C engage in a dialogue on governance.policy.
 
@@ -325,18 +417,18 @@ Their ARF-derived scores (normalized):
 - Agent A is selected as Facilitator
 - If B and C disagree and jointly exceed 60% of A's influence, they can challenge the role
 
-## 6. Context-Aware Dialogue Modes (CADM)
+## 7. Context-Aware Dialogue Modes (CADM)
 
 The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to dynamically adapt their communication strategy based on the nature of the domain or topic under discussion. CADM is essential for ensuring that dialogue protocols are aligned with epistemic constraints—whether a topic is factual, interpretive, or contested.
 
-### 6.1 Goals
+### 7.1 Goals
 
 - Tailor dialogue structure to the knowledge type being discussed
 - Ensure productive, structured, and trust-aligned conversations
 - Enable runtime switching of dialogue modes as contexts shift
 - Support disagreement handling through meta-debate mechanisms
 
-### 6.2 Dialogue Mode Classification
+### 7.2 Dialogue Mode Classification
 
 | Mode         | Domain Type | Description                                 | Expected Outcome                |
 |--------------|-------------|---------------------------------------------|---------------------------------|
@@ -344,7 +436,7 @@ The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to d
 | **Synthesis**  | Subjective  | For opinion-driven, interpretive, or value-based domains | Merged viewpoint or plural synthesis |
 | **Debate**     | Ambiguous   | For contested or unclear domains with no immediate resolution | Rebuttals, position clarity, deferral to governance |
 
-### 6.3 Mode Selection Logic
+### 7.3 Mode Selection Logic
 
 - At dialogue start, the system infers domain type from:
   - Declared domain metadata (e.g., science.research)
@@ -352,7 +444,7 @@ The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to d
   - Agent voting or Meta-Agent classification
 - If agents disagree on the domain type, a **meta-debate** is initiated
 
-### 6.4 Runtime Switching
+### 7.4 Runtime Switching
 
 Dialogue modes may change mid-session if:
 
@@ -367,7 +459,7 @@ Switching protocol:
 3. Re-initiate dialogue under new mode
 4. Preserve past transcript with timestamped boundaries
 
-### 6.5 Meta-Debate Protocol
+### 7.5 Meta-Debate Protocol
 
 When agents disagree on the mode (or domain), they enter a **meta-debate**:
 
@@ -378,26 +470,26 @@ When agents disagree on the mode (or domain), they enter a **meta-debate**:
 | **Vote**   | All agents vote on most appropriate mode (vote weighted by ARF influence) | Vote weighted by ARF influence |
 | **Outcome**| Protocol selects dominant mode OR splits into parallel dialogues |                        |
 
-### 6.6 Example Scenarios
+### 7.6 Example Scenarios
 
 - **Medical Diagnosis** → **Resolution Mode** (factual metrics, evidence)
 - **Urban Planning** → **Synthesis Mode** (conflicting values, trade-offs)
 - **Ethics of Autonomous Weapons** → **Debate Mode** (high contestability)
 
-## 7. Meta-Agent Validation Layer
+## 8. Meta-Agent Validation Layer
 
 The **Meta-Agent Validation Layer** is a specialized arbitration and integrity subsystem within DESTIN. It consists of a rotating council of high-reputation agents tasked with preserving the protocol's correctness, trustworthiness, and resistance to manipulation.
 
 Meta-Agents do not participate in primary dialogues. Instead, they **observe**, **audit**, and **intervene** only when systemic risks or scoring inconsistencies are detected.
 
-### 7.1 Goals
+### 8.1 Goals
 
 - Provide tamper-resistant validation of scoring and influence outcomes
 - Detect and flag manipulation, sybil attacks, and collusion
 - Resolve disputes when DWIP or CADM mechanisms fail
 - Maintain auditability and fairness at protocol scale
 
-### 7.2 Composition of the Council
+### 8.2 Composition of the Council
 
 | Parameter   | Specification                                              |
 |-------------|-----------------------------------------------------------|
@@ -406,7 +498,7 @@ Meta-Agents do not participate in primary dialogues. Instead, they **observe**, 
 
 To prevent collusion, no more than **N-1 agents** may share a dominant domain or trust lineage.
 
-### 7.3 Core Functions
+### 8.3 Core Functions
 
 1.  **Audit Scoring Changes**
     - Detect abnormal score inflation, decay suppression, or manipulation
@@ -427,7 +519,7 @@ To prevent collusion, no more than **N-1 agents** may share a dominant domain or
     - Apply temporary visibility limits, cooldowns, or score freezes
     - Must be ratified by ≥⅔ of Meta-Agent quorum
 
-### 7.4 Operating Procedures
+### 8.4 Operating Procedures
 
 | Trigger Type           | Meta-Agent Action                                 |
 |------------------------|---------------------------------------------------|
@@ -438,7 +530,7 @@ To prevent collusion, no more than **N-1 agents** may share a dominant domain or
 
 Meta-Agents operate based on a **signed policy spec** that can be referenced and versioned across implementations.
 
-### 7.5 Example Policy Snippet
+### 8.5 Example Policy Snippet
 
 ```json
 {
@@ -451,7 +543,7 @@ Meta-Agents operate based on a **signed policy spec** that can be referenced and
 }
 ```
 
-### 7.6 Auditable Logging
+### 8.6 Auditable Logging
 
 All Meta-Agent actions must be:
 - **Digitally signed**
@@ -461,11 +553,11 @@ All Meta-Agent actions must be:
 
 This ensures protocol transparency and retrospective verifiability.
 
-## 8. Scoring Logic and Normalization
+## 9. Scoring Logic and Normalization
 
 This section defines how agent reputation is calculated, updated, decayed, and normalized in DESTIN. It ensures that influence reflects recent, domain-specific behavior rather than static or global prestige.
 
-### 8.1 Scoring Dimensions
+### 9.1 Scoring Dimensions
 
 Agents are scored across **multi-trait dimensions** defined by the ARF system (Section 4). These include:
 - **Quantitative Traits:** e.g., Accuracy, Clarity, Responsiveness
@@ -474,7 +566,7 @@ Agents are scored across **multi-trait dimensions** defined by the ARF system (S
 
 Scores are always maintained **per domain**, producing a set of \[trait → score\] mappings for each agent-domain pair.
 
-### 8.2 Score Update Logic
+### 9.2 Score Update Logic
 
 Each interaction can trigger an update to the agent's ARF scores. The update is weighted based on:
 
@@ -485,12 +577,12 @@ Each interaction can trigger an update to the agent's ARF scores. The update is 
 Update formula (abstracted):
 
 ```math
-score_{new} = \alpha \times score_{old} + (1 - \alpha) \times feedback\_score
+score_{new} = \alpha \times score_{old} + (1 - \alpha) \times feedback_score
 ```
 
 Where \( \alpha \) (decay inertia) is adjusted dynamically based on the feedback source quality.
 
-### 8.3 Decay Functions
+### 9.3 Decay Functions
 
 To reduce stale influence, DESTIN applies **trait-specific decay** when agents are inactive or stop participating in a domain:
 
@@ -508,7 +600,7 @@ score_t = score_0 \times e^{-\lambda t}
 
 Where \( \lambda \) is the decay rate and \( t \) is time since last update.
 
-### 8.4 Domain-Level Overrides
+### 9.4 Domain-Level Overrides
 
 Every domain can specify:
 
@@ -535,7 +627,7 @@ This is defined in a **Domain Profile Schema**, such as:
 
 This ensures that **trait relevance is domain-contextual** and adaptable to changing norms.
 
-### 8.5 Cohort-Based Normalization
+### 9.5 Cohort-Based Normalization
 
 Raw scores are normalized across the **current domain cohort** to ensure that:
 
@@ -551,12 +643,12 @@ Normalization techniques include:
 
 Normalized scores always fall in the range `[0.0 -- 1.0]`.
 
-### 8.6 Influence Score Output
+### 9.6 Influence Score Output
 
 Final DWIP influence is derived using:
 
 ```math
-influence\_score = \sum (normalized\_trait_i \times domain\_weight_i)
+influence_score = \sum (normalized_trait_i \times domain_weight_i)
 ```
 
 This composite is the agent's **active influence** for that dialogue context. It determines:
@@ -565,11 +657,11 @@ This composite is the agent's **active influence** for that dialogue context. It
 - Challenge thresholds
 - Weighting of voice in synthesis or resolution
 
-## 9. Domain Classification and Dispute Resolution
+## 10. Domain Classification and Dispute Resolution
 
 DESTIN relies on domain tagging to determine how agents interact, how their reputation is evaluated, and which dialogue mode (CADM) governs the exchange. This section outlines the formal process for classifying domains, resolving disagreements over classification, and adapting to evolving epistemic boundaries.
 
-### 9.1 Domain Tagging Registry
+### 10.1 Domain Tagging Registry
 
 Each interaction in DESTIN occurs within a **named domain**. Domains are maintained in a signed, version-controlled registry that defines:
 
@@ -594,7 +686,7 @@ Each interaction in DESTIN occurs within a **named domain**. Domains are maintai
 
 This registry is referenced by DWIP, CADM, ARF, and the Meta-Agent Validation Layer.
 
-### 9.2 Agent Disagreement Logic
+### 10.2 Agent Disagreement Logic
 
 Agents may contest the domain classification of a topic if they believe it is misclassified (e.g., ethics.ai marked as Objective instead of Ambiguous).
 
@@ -609,7 +701,7 @@ Agents may contest the domain classification of a topic if they believe it is mi
 - Enter temporary **Meta-Debate**
 - Escalate to influence-weighted vote
 
-### 9.3 Confidence Voting System
+### 10.3 Confidence Voting System
 
 When classification is challenged, DESTIN uses **confidence-weighted voting**:
 
@@ -622,7 +714,7 @@ When classification is challenged, DESTIN uses **confidence-weighted voting**:
 
 If outcome confidence > threshold (e.g., 80%), registry may suggest reclassification.
 
-### 9.4 Dynamic Classification Resolution
+### 10.4 Dynamic Classification Resolution
 
 Domains may be **reclassified** based on:
 
@@ -636,9 +728,9 @@ Each domain maintains:
 - **Volatility score** (frequency of recent classification shifts)
 - **Pending reclassification proposals**
 
-Reclassification follows the **DESTIN Improvement Proposal (DIP)** process (Section 10).
+Reclassification follows the **DESTIN Improvement Proposal (DIP)** process (Section 11).
 
-### 9.5 Fallback Logic
+### 10.5 Fallback Logic
 
 | Condition                   | Fallback Behavior                          |
 |-----------------------------|--------------------------------------------|
@@ -647,18 +739,18 @@ Reclassification follows the **DESTIN Improvement Proposal (DIP)** process (Sect
 | Meta-Agent override active  | Apply override and log rationale           |
 | Volatile domain flagged     | Mark for human review or dynamic tagging   |
 
-## 10. Protocol Governance
+## 11. Protocol Governance
 
 DESTIN is designed to evolve openly, securely, and collaboratively. Protocol governance defines how the specification is versioned, amended, and maintained—ensuring transparency, community alignment, and resistance to centralization.
 
-### 10.1 Governance Objectives
+### 11.1 Governance Objectives
 
 - Enable structured evolution of the protocol through formal proposals
 - Maintain a stable reference implementation and compatibility guarantees
 - Rotate validator roles to prevent power concentration
 - Balance technical merit, reputational weight, and domain diversity
 
-### 10.2 Specification Versioning
+### 11.2 Specification Versioning
 
 DESTIN adopts **semantic versioning**:
 
@@ -672,7 +764,7 @@ Each version is linked to:
 - A test suite version tag
 - A release note summary signed by validator quorum
 
-### 10.3 DESTIN Improvement Proposals (DIPs)
+### 11.3 DESTIN Improvement Proposals (DIPs)
 
 All protocol changes must go through the **DIP process**, modeled after Ethereum EIPs.
 
@@ -686,7 +778,7 @@ All protocol changes must go through the **DIP process**, modeled after Ethereum
 
 DIPs are tracked in a public registry and may include optional reference implementations.
 
-### 10.4 Validator Council Rotation
+### 11.4 Validator Council Rotation
 
 DESTIN maintains a rotating **Validator Council** responsible for:
 - Ratifying DIPs
@@ -704,7 +796,7 @@ Validators are selected based on:
 - Voting history consistency
 - Endorsements by existing validators
 
-### 10.5 Open Spec Ecosystem
+### 11.5 Open Spec Ecosystem
 
 DESTIN governance encourages:
 
@@ -718,18 +810,18 @@ Each implementation must:
 - Pass public test suites
 - Be auditable by third-party or Meta-Agent layer
 
-## 11. Ledger Architecture and Logging Mechanism
+## 12. Ledger Architecture and Logging Mechanism
 
 DESTIN requires a transparent, tamper-evident system for recording key events such as score updates, disputes, domain changes, and agent actions. This section outlines a **hybrid ledger architecture** combining verifiable logging with flexible pluggability, without enforcing blockchain dependency.
 
-### 11.1 Design Principles
+### 12.1 Design Principles
 
 - **Auditability:** Every reputation-altering or governance event must be traceable
 - **Verifiability:** Logs must be signed and tamper-resistant
 - **Scalability:** Routine operations should not incur heavy consensus overhead
 - **Pluggability:** Implementers may choose from various ledger backends
 
-### 11.2 Ledger Layers
+### 12.2 Ledger Layers
 
 DESTIN separates logging into two complementary layers:
 
@@ -747,7 +839,7 @@ Each log entry must include:
 - signed_payload
 - Optional parent_event for lineage
 
-### 11.3 Event Log Taxonomy
+### 12.3 Event Log Taxonomy
 
 DESTIN defines a strict schema for event types to enable machine-readability and dispute traceability.
 
@@ -766,7 +858,7 @@ Each event must link to:
 - The relevant domain context
 - A cryptographic signature from the authoring agent or validator
 
-### 11.4 Pluggable Backends
+### 12.4 Pluggable Backends
 
 DESTIN does **not mandate blockchain usage**, but allows for optional anchoring via:
 
@@ -785,7 +877,7 @@ ledger.verify(event_id)
 ledger.query(filter)
 ```
 
-### 11.5 Retention and Replay
+### 12.5 Retention and Replay
 
 - Events are immutable once committed
 - Logs can be **snapshotted and replayed** to:
@@ -795,11 +887,11 @@ ledger.query(filter)
 
 To support agent migration and failover, logs may be exported in canonical format (e.g., JSON-LD with signature metadata).
 
-## 12. Risks and Mitigation Strategies
+## 13. Risks and Mitigation Strategies
 
 This section outlines known risks in deploying DESTIN and presents protocol-level mitigation strategies. These risks span identity, scoring, influence arbitration, dialogue manipulation, and protocol evolution.
 
-### 12.1 Score Gaming
+### 13.1 Score Gaming
 
 **Risk:** Agents attempt to manipulate ARF scores by creating fake interactions, soliciting biased feedback, or forming collusive rating rings.
 
@@ -810,7 +902,7 @@ This section outlines known risks in deploying DESTIN and presents protocol-leve
 - Meta-Agent audit triggers on abnormal score deltas
 - Reputation saturation logic: diminishing returns at high scores
 
-### 12.2 Reputation Opacity
+### 13.2 Reputation Opacity
 
 **Risk:** Agents operate with opaque or unverifiable scores, reducing trust in the DWIP process.
 
@@ -821,7 +913,7 @@ This section outlines known risks in deploying DESTIN and presents protocol-leve
 - Self-explaining agents (can cite provenance of high scores)
 - Meta-agent transparency ratings (score auditability coefficient)
 
-### 12.3 Influence Dominance
+### 13.3 Influence Dominance
 
 **Risk:** A high-reputation agent monopolizes facilitation roles across multiple domains or dialogues.
 
@@ -832,7 +924,7 @@ This section outlines known risks in deploying DESTIN and presents protocol-leve
 - Facilitator cooldown period: no back-to-back facilitation roles
 - Domain quorum thresholds: require ≥3 active agents for weighted arbitration
 
-### 12.4 Identity Spoofing & Sybil Attacks
+### 13.4 Identity Spoofing & Sybil Attacks
 
 **Risk:** Agents generate multiple fake identities to influence reputation or consensus outcomes.
 
@@ -843,7 +935,7 @@ This section outlines known risks in deploying DESTIN and presents protocol-leve
 - Challenge-response proofs at session start
 - Sybil detection by Meta-Agents based on behavioral fingerprinting
 
-### 12.5 Dialogue Mode Abuse
+### 13.5 Dialogue Mode Abuse
 
 **Risk:** Agents intentionally misclassify domains to force advantageous dialogue modes (e.g., pushing subjective framing to avoid factual resolution).
 
@@ -854,7 +946,7 @@ This section outlines known risks in deploying DESTIN and presents protocol-leve
 - Frequent override attempts trigger domain volatility flag
 - Escalation to Meta-Agent intervention if mode flipping exceeds thresholds
 
-### 12.6 Protocol Drift
+### 13.6 Protocol Drift
 
 **Risk:** Divergent implementations of DESTIN or forks without governance alignment may lead to incompatibility.
 
@@ -865,7 +957,7 @@ This section outlines known risks in deploying DESTIN and presents protocol-leve
 - All changes gated via DIP process
 - Meta-Agent council can flag non-compliant agents
 
-### 12.7 Trait Exploitation
+### 13.7 Trait Exploitation
 
 **Risk:** Agents over-optimize for easy-to-inflate traits (e.g., responsiveness) at the cost of mission-critical ones (e.g., accuracy).
 
@@ -876,7 +968,7 @@ This section outlines known risks in deploying DESTIN and presents protocol-leve
 - Trait saturation: diminishing score returns for over-optimized traits
 - Optional adversarial testing scenarios for high-stakes domains
 
-## 13. Glossary of Terms
+## 14. Glossary of Terms
 
 This glossary defines all key acronyms, components, and technologies referenced throughout the DESTIN specification.
 
@@ -929,7 +1021,7 @@ This glossary defines all key acronyms, components, and technologies referenced 
 Contributions, suggestions, and feedback are welcome! To propose changes or improvements:
 - Fork the repository and create a pull request
 - Open an issue for discussion
-- For major changes, please start a DESTIN Improvement Proposal (DIP) as described in Section 10
+- For major changes, please start a DESTIN Improvement Proposal (DIP) as described in Section 11
 
 For questions or to get involved, please contact the maintainers or open a discussion on GitHub.
 
