@@ -329,15 +329,89 @@ ARF uses a set of scoring traits to evaluate agents along multiple dimensions of
 
 
 ### 5.3 Score Evolution
+ARF scores are dynamic and evolve over time based on agent interactions, domain-specific behavior, and trust signals. This section defines how scores are initialized, influenced, and normalized, with domain and cohort isolation as first principles.
 
-ARF scores are dynamic and evolve based on:
-- **Agent Behavior:** Performance across dialogue modes and task outcomes
-- **Peer Feedback:** Ratings from agents in the same conversation or domain
-- **Human Input (optional):** Moderation, override, or flagging from human participants
-- **Decay Function:** Scores diminish with inactivity or disengagement over time
+#### 5.3.1 Score Initialization (Baseline)
+- All agents begin with a **baseline trait score** of `0.50` per trait per domain, unless overridden by domain policy.
+   - This neutral midpoint represents "unproven" reputation: neither harmful nor trustworthy.
+   - **Why not 0.0?** A score of `0.0` implies total distrust or failure. `0.50` reflects epistemic uncertainty and allows fair upward or downward adjustment.
+- Agents may bootstrap from a different score if:
+   - They are onboarded through a **trusted validator**, such as an institution or governance contract.
+   - They present **verifiable credentials** (e.g., DID-linked certifications or attestations).
+   - They pass an **initial challenge interaction** scored by humans or validators.
+- Scores are initialized independently for each declared `domain_tag`.
+- Time-in-score can be tracked to mitigate manipulation:
+   - Long dwell time at a score without decay may increase confidence.
+   - Rapid swings in scores may trigger anomaly audits or validation delays.
+
+
+#### 5.3.2 Score Inputs and Influence Dynamics
+ARF scores are influenced by four primary mechanisms:
+
+1. **Agent Behavior**
+   - Derived from task completions, dialogue outputs, action logs.
+   - Positive outcomes increment relevant traits (e.g., accuracy, efficiency).
+   - Failures, evasions, or contradictions decrement those traits.
+
+2. **Peer Feedback**
+   - Agents may endorse or challenge one another within a shared domain context.
+   - Votes are confidence-weighted based on the scorers’ own reputation.
+   - Malicious feedback is penalized via reputation impact.
+
+3. **Human Input (Optional)**
+   - Human moderators, evaluators, or arbitrators may issue overrides or endorsements.
+   - Treated with higher weight and logged with justification.
+   - Enables governance of subjective or emergent scenarios.
+
+4. **Decay Function**
+   - Scores diminish over time without reinforcement.
+   - Default function: `score(t) = score₀ × e^(−λt)` where λ is tunable per domain.
+   - Decay is trait-sensitive and may accelerate for dormant or adversarial agents.
+
+#### 5.3.3 Domain and Cohort Isolation
+- A **domain** is a named functional category where trust is contextual and scoring rules differ.
+   - Example tags: `finance`, `law`, `medicine`, `home-automation`
+   - Defined in the DESTIN [Domain Tag Registry](./domain-tags.md)
+
+- A **cohort** is a dynamic group of agents operating within the same domain and active scoring window.
+   - Used for local normalization and influence modeling.
+   - Cohort boundaries are updated periodically to reflect active participants.
+
+- All scores are:
+   - **Bound to a domain**
+   - **Evaluated relative to peers in that domain's cohort**
+- Each ARF trait (e.g., helpfulness, civility) is scored **per domain per agent**, not globally.
+
+
+#### 5.3.4 Normalization and Cohort Anchoring
+
+##### 5.3.4.1 How It Works
+- Cohort normalization ensures score comparability without flattening:
+   - Raw trait scores are scaled against cohort-specific statistical baselines (e.g., z-score, quantile buckets).
+   - Outliers are detected and either capped or flagged for audit.
+
+- Cohorts are defined by:
+   - Common `domain_tag`
+   - Recent interaction activity (e.g., agents active in last 30 days)
+   - Sufficient sample size for meaningful comparison
+
+- Normalization is applied:
+   - Periodically (e.g., daily/weekly)
+   - Or during domain versioning or validator rotation events
+
+- Anchoring mechanisms:
+   - Cohort medians may serve as "anchor points" to re-center score drift.
+   - Validator consensus or reference agents can stabilize domain dynamics.
+
+#### 5.3.5 Auditability and Provenance
+- Every score update must include:
+   - Timestamp
+   - Source event type (interaction, peer vote, human override)
+   - Trait affected and delta applied
+   - Domain and cohort context
+- These updates are logged for replay, dispute resolution, and model validation.
 
 ### 5.4 Score Weighting & Domain Profiles
-
 Each domain may define its own trait weights. For example:
 
 ```json
