@@ -426,7 +426,7 @@ A **Domain Profile** is a structured configuration that governs how agents are e
 - `default_modes`: One or more CADM dialogue modes preferred in this domain
 - `scoring_modifiers` (optional): Decay rate overrides, audit sensitivity, or trust thresholds
 
-These profiles enable domain-sensitive evaluation while preserving the protocol’s generality.
+These profiles enable domain-sensitive evaluation while preserving the protocol's generality.
 
 ##### 5.4.2 Trait Weight Semantics
 
@@ -436,7 +436,7 @@ Trait weights are used as **multipliers** during:
 - DWIP voting (e.g., higher-weighted traits influence vote power more)
 - Decay calibration (optional per domain)
 
-Weights > 1 amplify a trait’s influence. Weights < 1 reduce it. This allows each domain to emphasize what matters most.
+Weights > 1 amplify a trait's influence. Weights < 1 reduce it. This allows each domain to emphasize what matters most.
 
 ##### 5.4.3 Example Domain Profile
 
@@ -458,16 +458,67 @@ Weights > 1 amplify a trait’s influence. Weights < 1 reduce it. This allows ea
 #### 5.4.4 Registry and Governance
 All domain profiles are maintained in the [Domain Tag Registry](./domain-tags.md) and versioned under DESTIN protocol governance. Proposed changes must go through the DIP process.
 
-### 5.5 Anti-Manipulation Features
+#### 5.5 Anti-Manipulation Features
+To preserve the integrity of the ARF scoring system and prevent trust distortion, DESTIN enforces a multi-layered anti-manipulation framework. These mechanisms mitigate known attack vectors such as sybil attacks, collusion, and reputation gaming.
 
-To protect the reputation layer from abuse:
-- **Rate Limiting:** Feedback and interactions are throttled per agent
-- **Reputation Saturation:** Diminishing returns past 95th percentile influence
-- **Outlier Detection:** Meta-Agent Layer can flag or freeze suspicious score changes
-- **Transparency Logs:** Score changes logged in append-only public logs
+##### 5.5.1 Threats Addressed
+
+| Threat Type           | Description                                                        | Mitigation Tools                                 |
+|-----------------------|--------------------------------------------------------------------|--------------------------------------------------|
+| Sybil Attacks         | Fake agents created to inflate influence or provide false endorsements | Confidence weighting, identity binding, trust radius |
+| Collusion Rings       | Coordinated agents inflating each other's scores                   | Anomaly detection, audit trails                  |
+| Score Pumping         | Excessive positive feedback without proportional output            | Influence rate-limiting, decay lock              |
+| Shadow Boosting       | Low-reputation agents endorsing each other in isolation            | Minimum reputation thresholds, trust radius       |
+| Reputational Spoofing | Temporarily behaving well to mask harmful intent                   | Time-in-score tracking, decay slope analysis      |
+
+
+##### 5.5.2 Core Controls
+
+- **Influence Rate-Limiting**
+   - Caps the maximum score delta any agent can induce per unit time or per cohort window.
+   - Prevents rapid trust inflation through repetitive endorsement loops.
+
+- **Confidence Weighting**
+   - Peer influence is scaled by the reputation of the scorer.
+   - Low-reputation agents have diminished impact on others' scores.
+
+- **Anomaly Detection**
+   - Uses statistical and structural analysis to detect:
+     - Score spikes outside expected bounds
+     - Feedback cycles between agents
+     - Rapid domain switching or cross-influence artifacts
+
+- **Audit Trails**
+   - Every score change, feedback, and vote is logged with:
+     - Source (agent or human)
+     - Timestamp
+     - Interaction ID
+     - Delta value and reason (where applicable)
+
+- **Challenge-and-Prove**
+   - Agents may formally challenge their own score deltas or those of others.
+   - Triggers review by validators or the Meta-Agent Validation Layer.
+   - Validators may:
+     - Roll back malicious scores
+     - Flag actors for monitoring
+     - Reclassify domain influence profiles
+
+- **Trust Radius Filtering**
+   - Limits peer impact to:
+     - Agents within a minimum reputation threshold
+     - Agents with shared domain overlap or recent interaction history
+   - Reduces attack surface from unknown or untrustworthy sources.
+
+- **Behavioral Rate Throttling**
+   - Even legitimate agents have a maximum growth velocity per trait.
+   - Prevents sudden, unbounded score gains even from valid activity.
+
+##### 5.5.3 System Notes
+- All manipulation defenses are **domain-local** and **cohort-relative**.
+- Enforcement rules are pluggable and can evolve via the DIP process.
+- Score provenance and auditability are first-class requirements for validators.
 
 ### 5.6 Interoperability
-
 ARF scores are structured as JSON-LD objects to support:
 
 - Semantic linking with external systems
@@ -1185,6 +1236,9 @@ This glossary defines all key acronyms, components, and technologies referenced 
 | **Trait Saturation**     | Diminishing returns for overscoring traits                |
 | **Influence Score**      | Weighted sum of ARF traits used to determine agent impact |
 | **Append-Only Logs**     | Immutable, signed records of interactions and events      |
+| **Sybil Attacks**      | The creation of multiple fake identities by a single adversary to manipulate reputation scores, influence outcomes, or subvert consensus mechanisms. |
+| **Collusion**          | Coordinated behavior between two or more agents to unfairly manipulate reputation, influence, or decision outcomes, often at the expense of protocol fairness. |
+| **Reputation Gaming**  | Strategic manipulation of the reputation system by agents (individually or in groups) to artificially inflate scores, evade penalties, or gain undue influence. |
 
 ## 15. Contributing
 
