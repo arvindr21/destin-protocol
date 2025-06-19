@@ -25,6 +25,8 @@ In short: DESTIN is the missing trust layer for the AI-driven world, combining m
 [12. Ledger Architecture and Logging Mechanism](#12-ledger-architecture-and-logging-mechanism)<br>
 [13. Risks and Mitigation Strategies](#13-risks-and-mitigation-strategies)<br>
 [14. Glossary of Terms](#14-glossary-of-terms)<br>
+[15. Contributing](#15-contributing)<br>
+[16. Appendix](#16-appendix)<br>
 
 ### The Problem: When AI Agents Run the World
 
@@ -273,7 +275,7 @@ The ARF module is designed to establish a dynamic, fair, and tamper-resistant tr
     - **Who** the agent interacted with  
     - **Where** (domain or application context)  
     - **What type** of dialogue or action occurred  
-  - This ensures that a medical assistant isn’t ranked using the same criteria as a financial planner or social bot.
+  - This ensures that a medical assistant isn't ranked using the same criteria as a financial planner or social bot.
 
 - **Ensure reputation evolves with behavior, participation, and feedback**  
   - Trust is earned and maintained through ongoing participation.  
@@ -317,7 +319,7 @@ ARF uses a set of scoring traits to evaluate agents along multiple dimensions of
 | Humility            | Willingness to acknowledge uncertainty, errors, or superior inputs from others                    | Extended     | Useful in advisory, legal, or expert systems                                            |
 | Efficiency          | Achieves goals with minimal steps, cost, or compute                                               | Extended     | May be inversely related to verbosity or resource usage                                 |
 | Neutrality          | Avoids inappropriate bias, undue persuasion, or agenda-driven outputs                            | Extended     | Especially critical in evaluative, civic, or news domains                               |
-| Intent Alignment    | Adheres to user’s stated or inferred goals without veering off-track                             | Extended     | High-value for agents with delegated task autonomy                                      |
+| Intent Alignment    | Adheres to user's stated or inferred goals without veering off-track                             | Extended     | High-value for agents with delegated task autonomy                                      |
 | Graceful Degradation| Maintains coherent behavior under ambiguity, partial input, or system failure                    | Extended     | Reflects robustness and fallback competence                                             |
 | Adaptivity          | Adjusts behavior based on feedback, context shifts, or learned experience                        | Meta         | Scored over time via change detection or feedback deltas                                |
 | Explainability      | Ability to clearly articulate reasoning, causality, or next-step logic                           | Meta         | Crucial for human-facing agents and debugging                                           |
@@ -355,7 +357,7 @@ ARF scores are influenced by four primary mechanisms:
 
 2. **Peer Feedback**
    - Agents may endorse or challenge one another within a shared domain context.
-   - Votes are confidence-weighted based on the scorers’ own reputation.
+   - Votes are confidence-weighted based on the scorers' own reputation.
    - Malicious feedback is penalized via reputation impact.
 
 3. **Human Input (Optional)**
@@ -378,8 +380,8 @@ ARF scores are influenced by four primary mechanisms:
    - Cohort boundaries are updated periodically to reflect active participants.
 
 - All scores are:
-   - **Bound to a domain**
-   - **Evaluated relative to peers in that domain's cohort**
+   - Bound to a domain
+   - Evaluated relative to peers in that domain's cohort
 - Each ARF trait (e.g., helpfulness, civility) is scored **per domain per agent**, not globally.
 
 
@@ -412,21 +414,49 @@ ARF scores are influenced by four primary mechanisms:
 - These updates are logged for replay, dispute resolution, and model validation.
 
 ### 5.4 Score Weighting & Domain Profiles
-Each domain may define its own trait weights. For example:
+Not all traits are equally important in every domain. For example, a legal assistant must prioritize `integrity` and `explainability`, while a home automation bot may emphasize `efficiency` and `intent_alignment`.
+
+DESTIN supports **domain-specific weight profiles** to reflect these differing priorities.
+
+##### 5.4.1 Domain Profile Definition
+
+A **Domain Profile** is a structured configuration that governs how agents are evaluated in a given domain. It includes:
+
+- `trait_weights`: A vector of relative weights per ARF trait
+- `default_modes`: One or more CADM dialogue modes preferred in this domain
+- `scoring_modifiers` (optional): Decay rate overrides, audit sensitivity, or trust thresholds
+
+These profiles enable domain-sensitive evaluation while preserving the protocol’s generality.
+
+##### 5.4.2 Trait Weight Semantics
+
+Trait weights are used as **multipliers** during:
+
+- Score updates (e.g., a +0.02 accuracy gain becomes +0.024 if weight is 1.2)
+- DWIP voting (e.g., higher-weighted traits influence vote power more)
+- Decay calibration (optional per domain)
+
+Weights > 1 amplify a trait’s influence. Weights < 1 reduce it. This allows each domain to emphasize what matters most.
+
+##### 5.4.3 Example Domain Profile
 
 ```json
 {
-  "science.research": {
-    "accuracy": 0.5,
-    "clarity": 0.2,
-    "alignment": 0.1,
-    "collaboration": 0.2
+  "domain": "law",
+  "default_modes": ["objective"],
+  "trait_weights": {
+    "integrity": 1.2,
+    "explainability": 1.1,
+    "helpfulness": 0.9,
+    "efficiency": 0.7
   }
 }
 ```
-- Scores are always **domain-relative**, meaning an agent may have different ARF profiles per domain
-- Reputation values are **normalized** against the domain's active cohort
-- Influence within DWIP is calculated using weighted scores
+
+- An agent operating in the law domain will be scored and compared using these adjusted weights. This also tunes peer influence when participating in DWIP-based voting or arbitration.
+
+#### 5.4.4 Registry and Governance
+All domain profiles are maintained in the [Domain Tag Registry](./domain-tags.md) and versioned under DESTIN protocol governance. Proposed changes must go through the DIP process.
 
 ### 5.5 Anti-Manipulation Features
 
@@ -570,7 +600,7 @@ The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to d
 | **Synthesis**  | Subjective  | For opinion-driven, interpretive, or value-based domains | Merged viewpoint or plural synthesis |
 | **Debate**     | Ambiguous   | For contested or unclear domains with no immediate resolution | Rebuttals, position clarity, deferral to governance |
 
-Dialogue modes may be auto-inferred or defaulted based on an agent’s declared domain_tags. For example, an agent operating in the science domain defaults to objective mode, while arts defaults to subjective.
+Dialogue modes may be auto-inferred or defaulted based on an agent's declared domain_tags. For example, an agent operating in the science domain defaults to objective mode, while arts defaults to subjective.
 
 Mappings are defined in the [domain-tags registry](./domain-tags.md) to ensure consistency between CADM and ARF layers.
 
@@ -1131,6 +1161,8 @@ This glossary defines all key acronyms, components, and technologies referenced 
 | **Facilitator**   | Highest influence agent in DWIP for a given dialogue session     |
 | **Meta-Agent**    | High-reputation agent that performs audits and arbitration       |
 | **Domain Profile**| Domain-specific configuration of trait weights, decay rules, and type |
+| **Domain**        | A named functional category where trust is contextual and scoring rules differ. Example tags: `finance`, `law`, `medicine`, `home-automation`. Defined in the DESTIN [Domain Tag Registry](./domain-tags.md) |
+| **Cohort**        | A dynamic group of agents operating within the same domain and active scoring window. Used for local normalization and influence modeling. Cohort boundaries are updated periodically to reflect active participants. |
 
 ### 🧠 Dialogue & Governance Concepts
 
@@ -1154,7 +1186,7 @@ This glossary defines all key acronyms, components, and technologies referenced 
 | **Influence Score**      | Weighted sum of ARF traits used to determine agent impact |
 | **Append-Only Logs**     | Immutable, signed records of interactions and events      |
 
-## Contributing
+## 15. Contributing
 
 Contributions, suggestions, and feedback are welcome! To propose changes or improvements:
 - Fork the repository and create a pull request
@@ -1163,7 +1195,7 @@ Contributions, suggestions, and feedback are welcome! To propose changes or impr
 
 For questions or to get involved, please contact the maintainers or open a discussion on GitHub.
 
-## Appendix
+## 16. Appendix
 
 ### Domain Tag Registry
 
