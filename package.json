@@ -1,6 +1,6 @@
 {
   "name": "destin-protocol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A decentralized protocol for agent trust, dialogue, and influence in open multi-agent systems.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
