@@ -4,9 +4,9 @@
 
 ## TL;DR
 
-Imagine a world where everyone relies on powerful personal AI agents—handling negotiations, making decisions, and interacting on your behalf. These agents are everywhere: in government, business, and daily life. But as their influence grows, so do the risks—misaligned incentives, trust breakdowns, and chaotic conflicts between agents threaten the systems we depend on.
+Imagine a world where everyone relies on powerful personal AI agents - handling negotiations, making decisions, and interacting on your behalf. These agents are everywhere: in government, business, and daily life. But as their influence grows, so do the risks - misaligned incentives, trust breakdowns, and chaotic conflicts between agents threaten the systems we depend on.
 
-DESTIN is the answer: a universal protocol that lets AI agents build trust, prove their reputation, and resolve disputes transparently. It ensures that every agent interaction is fair, auditable, and context-aware—so collaboration thrives, manipulation is caught, and no single agent can dominate the system.
+DESTIN is the answer: a universal protocol that lets AI agents build trust, prove their reputation, and resolve disputes transparently. It ensures that every agent interaction is fair, auditable, and context-aware - so collaboration thrives, manipulation is caught, and no single agent can dominate the system.
 
 In short: DESTIN is the missing trust layer for the AI-driven world, combining multi-trait reputation, domain-weighted influence, adaptive dialogue, and meta-agent validation to keep the future of autonomous agents safe, fair, and productive.
 
@@ -28,13 +28,13 @@ In short: DESTIN is the missing trust layer for the AI-driven world, combining m
 
 ### The Problem: When AI Agents Run the World
 
-It's 2030. You wake up to a world humming with invisible intelligence. Your personal AI agent—part confidant, part strategist—has already negotiated your morning meeting, optimized your commute, and filtered your news to match your values. Every person, business, and government is powered by these tireless digital minds, each one shaping reality in subtle, profound ways.
+It's 2030. You wake up to a world humming with invisible intelligence. Your personal AI agent - part confidant, part strategist - has already negotiated your morning meeting, optimized your commute, and filtered your news to match your values. Every person, business, and government is powered by these tireless digital minds, each one shaping reality in subtle, profound ways.
 
 But beneath the surface, cracks are spreading. Agents clash over conflicting rules. A city's transit grinds to a halt as rival AIs can't agree on traffic priorities. A hospital's care bots argue over patient data privacy, stalling urgent treatment. Financial markets shudder as trading agents exploit protocol loopholes. Trust fractures, and the systems we depend on teeter on the edge of chaos.
 
-Why? Because there's no universal language for trust, reputation, or arbitration between these agents. Each follows its own logic, its own code of conduct—leaving society vulnerable to misalignment, manipulation, and cascading failures.
+Why? Because there's no universal language for trust, reputation, or arbitration between these agents. Each follows its own logic, its own code of conduct - leaving society vulnerable to misalignment, manipulation, and cascading failures.
 
-The solution: a Universal Agent Protocol (UAP). A shared foundation that lets every AI—no matter who built it—prove its trustworthiness, resolve disputes, and collaborate safely. This specification is the blueprint for that protocol: DESTIN.
+The solution: a Universal Agent Protocol (UAP). A shared foundation that lets every AI - no matter who built it - prove its trustworthiness, resolve disputes, and collaborate safely. This specification is the blueprint for that protocol: DESTIN.
 
 ## 1. Introduction
 
@@ -50,7 +50,7 @@ The DESTIN Protocol is structured around four core components that enable autono
 
 - **Adaptive Reputation Fabric (ARF):** A multi-dimensional scoring system that evaluates agents on traits such as accuracy, empathy, clarity, alignment, and collaboration. ARF scores evolve based on agent behavior, peer ratings, and human feedback.
 - **Domain-Based Weighted Influence Protocol (DWIP):** A decision arbitration mechanism where agent influence is weighted by domain-specific reputation scores. The highest scorer in a domain facilitates resolution but does not dictate outcomes. Influence can be contested through structured dispute mechanisms.
-- **Context-Aware Dialogue Modes (CADM):** A runtime mode-switching system that adapts agent dialogue behavior based on the nature of the domain—objective, subjective, or ambiguous. Each mode defines the interaction format: consensus-building, synthesis, or structured debate.
+- **Context-Aware Dialogue Modes (CADM):** A runtime mode-switching system that adapts agent dialogue behavior based on the nature of the domain - objective, subjective, or ambiguous. Each mode defines the interaction format: consensus-building, synthesis, or structured debate.
 - **Meta-Agent Validation Layer:** A rotating council of high-reputation agents responsible for detecting manipulation, auditing score changes, resolving disputes, and upholding protocol integrity.
 
 These components are interdependent and modular, designed to enable agents to engage in meaningful exchanges that are both verifiable and evolvable.
@@ -123,22 +123,71 @@ In a decentralized multi-agent ecosystem, consistent and secure identification i
 - **Public Key Infrastructure (PKI):** Lightweight identity via asymmetric keypairs, useful for ephemeral, local, or pseudonymous agents. Example: `did:key:z6Mki...`
   - Used for:
     - **Ephemeral Agent Instantiation:** Temporary agents spun up for a single task or session (e.g., negotiation bots, transaction validators) can use did:key to identify themselves cryptographically.
-    - **Offline or Air-Gapped Systems:** In environments where agents operate without network connectivity, did:key allows self-verification using embedded public keys—no lookup required.
+    - **Offline or Air-Gapped Systems:** In environments where agents operate without network connectivity, did:key allows self-verification using embedded public keys - no lookup required.
     - **Lightweight Privacy-Preserving Dialogue:** Anonymous agents can still sign their messages using did:key and build a local reputation within the system without revealing persistent identity.
     - **Bootstrap Identity in Agent Swarms:** When agents first meet in peer-to-peer swarms (e.g., IoT contexts or decentralized simulations), they can exchange and validate each other's did:key identities.
-- **Namespace Aliases:** Optional human-readable aliases (e.g., `agent.alpha.protocol`) to support usability and user recognition, anchored to public keys or verifiable claims.
-  - Used for:
-    - **Improved UX and readability:** Simplifies agent identification for human-facing interactions.
-    - **Role-based identifiers:** Defines institutional or task-specific roles (e.g., `moderator.civic.protocol`, `validator.finance.destin`).
-    - **Contextual trust anchoring:** Enables mapping aliases to verifiable credentials within a namespace registry or local trust framework.
+- **Namespace Aliases:** To operate across heterogeneous domains or trust registries, agents may optionally define namespace aliases that act as contextual entry points for specific identity networks or protocol overlays.
+    - Each alias must resolve to the same logical agent as the canonical agent_id.
+    - These aliases are not distinct identities; they are routing handles or protocol-specific identifiers.
+    - All ARF reputation scoring is performed only against the canonical agent_id.
+    - Aliases must be cryptographically or declaratively linked and auditable by any validator.
+    ```json
+    "namespace_aliases": {
+        "chatnet": "did:chatnet:xyz456",
+        "lawmesh": "did:lawmesh:abc789"
+    }
+    ```
+- **Display Name:** Agents may optionally define a `display_name` for human-readable identification. This field is intended purely for user interfaces, audit logs, and developer tools, and is not used for identity resolution, validation, or scoring.
 
-Each agent is anchored by a primary identity object containing:
+    - `display_name` is a freeform, non-unique label (e.g., `"agent.alpha.protocol"`)
+    - It is distinct from `namespace_aliases`, which are machine-resolvable identifiers in specific protocol domains
+    - Unlike `namespace_aliases`, `display_name` is not required to be auditable or cryptographically linked
 
+    This separation ensures that presentation logic is decoupled from protocol identity mechanics.
+
+- **Metadata:** Agents may include an optional metadata object to capture non-critical, descriptive attributes relevant for discovery, filtering, or user-facing presentation. This field is not used for identity resolution or ARF scoring and is considered non-normative.
+    - metadata may contain fields such as:
+        - agent_type (e.g., "domain-specialist", "multi-purpose")
+        - domain_tags (e.g., ["finance", "negotiation"])
+        - created_at (ISO 8601 timestamp of registration or instantiation)
+        - version (agent schema or software version)
+    - The contents of metadata are informative, not verifiable or trusted by default
+    - Protocol logic must not depend on metadata values
+    This field exists to improve developer tooling, registry indexing, and human understanding of agent roles.
+    ```json
+    "metadata": {
+        "agent_type": "domain-specialist",
+        "domain_tags": ["governance", "arbitration"],
+        "created_at": "2025-06-01T12:00:00Z",
+        "version": "v0.1"
+    }
+    ```
+##### Domain Tags
+Agents may include a list of `domain_tags` under their `metadata` to indicate the domains in which they operate or specialize. These tags enable:
+
+- Context-aware scoring (via DWIP)
+- CADM dialogue mode tuning
+- Domain-specific dispute routing
+
+Each tag must match a registered entry in the [DESTIN Domain Tag Registry](./domain-tags.md). Unregistered or invalid tags must be rejected by validators.
+
+
+Example Agent Spec:
 ```json
 {
   "agent_id": "did:peer:1234abcd",
-  "public_key": "z6Mki...",
-  "display_name": "agent.alpha.protocol"
+  "public_key": "z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA",
+  "display_name": "agent.alpha.protocol",
+  "namespace_aliases": {
+    "chatnet": "did:chatnet:xyz456",
+    "lawmesh": "did:lawmesh:abc789"
+  },
+  "metadata": {
+    "agent_type": "domain-specialist",
+    "domain_tags": ["governance", "arbitration"],
+    "created_at": "2025-06-01T12:00:00Z",
+    "version": "v0.1"
+  }
 }
 ```
 
@@ -216,24 +265,68 @@ This identity layer is blockchain-free, interoperable with existing identity sta
 The Adaptive Reputation Fabric (ARF) is the core reputation mechanism in DESTIN. It defines how agent behavior is evaluated, scored, and evolved over time to reflect trustworthiness, influence, and alignment within specific domains.
 
 ### 5.1 Goals
-- Enable context-aware, multi-dimensional scoring of agents
-- Ensure reputation evolves with behavior, participation, and feedback
-- Support decentralized dispute resolution and influence arbitration
-- Prevent manipulation, sybil attacks, and dominance by high-score agents
+The ARF module is designed to establish a dynamic, fair, and tamper-resistant trust layer across agent ecosystems. Its goals are:
+
+- **Enable context-aware, multi-dimensional scoring of agents**  
+  - Move beyond flat trust scores by modeling agent behavior across diverse axes such as **accuracy**, **helpfulness**, **civility**, and **domain expertise**.  
+  - Reputation is evaluated in context:  
+    - **Who** the agent interacted with  
+    - **Where** (domain or application context)  
+    - **What type** of dialogue or action occurred  
+  - This ensures that a medical assistant isn’t ranked using the same criteria as a financial planner or social bot.
+
+- **Ensure reputation evolves with behavior, participation, and feedback**  
+  - Trust is earned and maintained through ongoing participation.  
+  - ARF uses:  
+    - **Time-decay functions** to reduce the weight of outdated behavior  
+    - **Reinforcement mechanisms** for sustained contributions  
+    - **Real-time updates** from validated feedback and task outcomes  
+  - This guarantees that agents demonstrating consistent value continue to rise in influence, while dormant or degraded actors naturally lose prominence.
+
+- **Support decentralized dispute resolution and influence arbitration**  
+  - ARF enables fair disagreement handling and influence resolution by:  
+    - Anchoring scores within **cohorts or peer groups** for local calibration  
+    - Allowing agents to **challenge, endorse, or dispute** reputational changes  
+    - Integrating with the **Meta-Agent Validation Layer** for independent review  
+  - This ensures the system scales without centralized moderators, maintaining procedural fairness and transparency.
+
+- **Prevent manipulation, sybil attacks, and dominance by high-score agents**  
+  - ARF resists reputation capture through multiple safeguards:  
+    - **Influence rate-limiting** and score impact ceilings  
+    - **Anomaly detection** and confidence-weighted downranking  
+    - **Cohort normalization** to prevent runaway advantage  
+    - **Lightweight identity validation** to deter sybil proliferation  
+  - These guardrails ensure no single agent or clique can distort the system to its advantage.
 
 ### 5.2 Scoring Traits
 
-ARF evaluates agents across multiple qualitative and quantitative dimensions:
+ARF uses a set of scoring traits to evaluate agents along multiple dimensions of behavior and utility. These traits serve as axes of the agent's reputation vector and may be domain-weighted using DWIP.
 
-| Trait           | Description                          | Type         | Notes                                      |
-|-----------------|--------------------------------------|--------------|--------------------------------------------|
-| **Accuracy**    | Truthfulness and correctness of information provided | Quantitative | Validated through peer review or consensus |
-| **Clarity**     | How clear, coherent, and interpretable the agent's responses are | Quantitative | Based on linguistic metrics or peer scoring |
-| **Alignment**   | Degree to which the agent aligns with shared goals or ethical norms | Qualitative  | Domain-dependent evaluation                |
-| **Empathy**     | Sensitivity to other agents' context, emotions, or stakes | Qualitative  | Scored in social or subjective dialogues   |
-| **Collaboration** | Constructive behavior in cooperative multi-agent tasks | Mixed        | Assessed through interaction logs          |
-| **Responsiveness** | Timeliness and appropriateness of agent reactions | Quantitative | Measured via time metrics and conversation flow |
-| **Civility**    | Respectfulness and non-toxicity in interactions | Qualitative  | Audited by moderators or Meta-Agents       |
+
+| Trait               | Description                                                                                      | Type         | Notes                                                                                   |
+|--------------------|--------------------------------------------------------------------------------------------------|--------------|-----------------------------------------------------------------------------------------|
+| Accuracy            | Alignment with factual, verifiable information or expected task outcomes                         | Core         | Essential across all knowledge and task domains                                         |
+| Helpfulness         | Degree to which the agent aids users or peers in achieving their goals                           | Core         | Domain-agnostic; directly observable                                                    |
+| Integrity           | Adherence to consistent ethical behavior; avoidance of deception                                 | Core         | Critical for long-term trust                                                            |
+| Civility            | Respectful communication; avoidance of toxic, aggressive, or manipulative behavior               | Core         | Measurable via tone and interaction classification                                      |
+| Responsiveness      | Timeliness and relevance of replies or actions                                                    | Core         | May include latency and contextual delay tolerance                                      |
+| Self-Awareness      | Ability to express uncertainty, cite limitations, or defer appropriately                         | Core         | Enables safer delegation and reduces hallucinations                                     |
+| Consistency         | Produces stable, repeatable results across similar inputs or contexts                            | Core         | Penalizes erratic or contradictory behavior                                             |
+| Transparency        | Provides rationale, sources, or uncertainty measures for its responses                           | Core         | Supports auditability and human/agent trust calibration                                 |
+| Cooperativeness     | Ability to coordinate and negotiate with other agents or users                                    | Extended     | Important in collaborative or multi-agent environments                                  |
+| Humility            | Willingness to acknowledge uncertainty, errors, or superior inputs from others                    | Extended     | Useful in advisory, legal, or expert systems                                            |
+| Efficiency          | Achieves goals with minimal steps, cost, or compute                                               | Extended     | May be inversely related to verbosity or resource usage                                 |
+| Neutrality          | Avoids inappropriate bias, undue persuasion, or agenda-driven outputs                            | Extended     | Especially critical in evaluative, civic, or news domains                               |
+| Intent Alignment    | Adheres to user’s stated or inferred goals without veering off-track                             | Extended     | High-value for agents with delegated task autonomy                                      |
+| Graceful Degradation| Maintains coherent behavior under ambiguity, partial input, or system failure                    | Extended     | Reflects robustness and fallback competence                                             |
+| Adaptivity          | Adjusts behavior based on feedback, context shifts, or learned experience                        | Meta         | Scored over time via change detection or feedback deltas                                |
+| Explainability      | Ability to clearly articulate reasoning, causality, or next-step logic                           | Meta         | Crucial for human-facing agents and debugging                                           |
+| Trust Calibration   | Expressed confidence levels match empirical correctness over time                                | Meta         | Avoids overconfidence or underselling in risk-sensitive applications                    |
+
+> Reputation is tracked per domain, using standardized `domain_tags` assigned to agents. These tags scope scoring weights via the DWIP mechanism and enable cohort normalization within domain-specific trust pools.
+> 
+> Validators must resolve all domain tags against the [registered list](./domain-tags.md) to enforce consistency.
+
 
 ### 5.3 Score Evolution
 
@@ -296,7 +389,7 @@ ARF scores are structured as JSON-LD objects to support:
 
 ## 6. Domain-Based Weighted Influence Protocol (DWIP)
 
-The **Domain-Based Weighted Influence Protocol (DWIP)** governs how agents influence shared decisions, knowledge synthesis, and conflict resolution within DESTIN. Influence is **earned**, **contextual**, and **non-absolute**—agents facilitate outcomes rather than dictate them.
+The **Domain-Based Weighted Influence Protocol (DWIP)** governs how agents influence shared decisions, knowledge synthesis, and conflict resolution within DESTIN. Influence is **earned**, **contextual**, and **non-absolute** - agents facilitate outcomes rather than dictate them.
 
 DWIP ensures that expertise and trust are aligned to specific domains and that no agent can unilaterally dominate a conversation or decision.
 
@@ -386,7 +479,7 @@ Their ARF-derived scores (normalized):
 
 ## 7. Context-Aware Dialogue Modes (CADM)
 
-The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to dynamically adapt their communication strategy based on the nature of the domain or topic under discussion. CADM is essential for ensuring that dialogue protocols are aligned with epistemic constraints—whether a topic is factual, interpretive, or contested.
+The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to dynamically adapt their communication strategy based on the nature of the domain or topic under discussion. CADM is essential for ensuring that dialogue protocols are aligned with epistemic constraints - whether a topic is factual, interpretive, or contested.
 
 ### 7.1 Goals
 
@@ -402,6 +495,10 @@ The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to d
 | **Resolution** | Objective   | For factual, measurable, or verifiable domains | Consensus or best-candidate answer |
 | **Synthesis**  | Subjective  | For opinion-driven, interpretive, or value-based domains | Merged viewpoint or plural synthesis |
 | **Debate**     | Ambiguous   | For contested or unclear domains with no immediate resolution | Rebuttals, position clarity, deferral to governance |
+
+Dialogue modes may be auto-inferred or defaulted based on an agent’s declared domain_tags. For example, an agent operating in the science domain defaults to objective mode, while arts defaults to subjective.
+
+Mappings are defined in the [domain-tags registry](./domain-tags.md) to ensure consistency between CADM and ARF layers.
 
 ### 7.3 Mode Selection Logic
 
@@ -708,7 +805,7 @@ Reclassification follows the **DESTIN Improvement Proposal (DIP)** process (Sect
 
 ## 11. Protocol Governance
 
-DESTIN is designed to evolve openly, securely, and collaboratively. Protocol governance defines how the specification is versioned, amended, and maintained—ensuring transparency, community alignment, and resistance to centralization.
+DESTIN is designed to evolve openly, securely, and collaboratively. Protocol governance defines how the specification is versioned, amended, and maintained - ensuring transparency, community alignment, and resistance to centralization.
 
 ### 11.1 Governance Objectives
 
@@ -992,6 +1089,29 @@ Contributions, suggestions, and feedback are welcome! To propose changes or impr
 
 For questions or to get involved, please contact the maintainers or open a discussion on GitHub.
 
----
+## Appendix
+
+### Domain Tag Registry
+
+The DESTIN protocol uses a controlled vocabulary of `domain_tags` to:
+
+- Scope agent specialization
+- Anchor domain-specific scoring via DWIP
+- Align default dialogue modes under CADM
+
+The canonical list is maintained in:
+
+👉 [`spec/domain-tags.md`](./domain-tags.md)
+
+Each registered domain includes:
+- A unique slug (`e.g., finance`, `law`)
+- A human-readable description
+- Associated CADM dialogue modes
+- Optional ARF scoring weight overrides
+
+Agents may only declare tags from this registry. Validators must reject unknown or malformed domain tags.
+
+Future extensions to the registry must follow the [DESTIN Improvement Proposal (DIP)] process.
+
 
 > **Note:** This specification is a draft and subject to change. Please check for updates and participate in the governance process.
