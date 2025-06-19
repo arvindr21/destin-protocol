@@ -1,10 +1,39 @@
 # DESTIN Protocol Specification -- Draft v0.1
 
-You wake up in 2030. The world now runs on personal AI agents - everyone has one, like a supercharged personal assistant-meets-GPT that knows your habits, optimizes your life, and negotiates on your behalf.
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-Governments, businesses, and individuals all rely on them.
+## TL;DR
 
-But chaos looms. People's agents are out of sync with public systems. Privacy, power, and protocol conflicts are crashing critical services. The goal is to design a Universal Agent Protocol (UAP) - a set of rules every AI must follow to coexist peacefully and productively with others. This specification is an attempt to build that protocol.
+Imagine a world where everyone relies on powerful personal AI agents—handling negotiations, making decisions, and interacting on your behalf. These agents are everywhere: in government, business, and daily life. But as their influence grows, so do the risks—misaligned incentives, trust breakdowns, and chaotic conflicts between agents threaten the systems we depend on.
+
+DESTIN is the answer: a universal protocol that lets AI agents build trust, prove their reputation, and resolve disputes transparently. It ensures that every agent interaction is fair, auditable, and context-aware—so collaboration thrives, manipulation is caught, and no single agent can dominate the system.
+
+In short: DESTIN is the missing trust layer for the AI-driven world, combining multi-trait reputation, domain-weighted influence, adaptive dialogue, and meta-agent validation to keep the future of autonomous agents safe, fair, and productive.
+
+## Table of Contents
+[1. Introduction](#1-introduction)<br>
+[2. Protocol Overview](#2-protocol-overview)<br>
+[3. Agent Identity Management](#3-agent-identity-management)<br>
+[4. Adaptive Reputation Fabric (ARF)](#4-adaptive-reputation-fabric-arf)<br>
+[5. Domain-Based Weighted Influence Protocol (DWIP)](#5-domain-based-weighted-influence-protocol-dwip)<br>
+[6. Context-Aware Dialogue Modes (CADM)](#6-context-aware-dialogue-modes-cadm)<br>
+[7. Meta-Agent Validation Layer](#7-meta-agent-validation-layer)<br>
+[8. Scoring Logic and Normalization](#8-scoring-logic-and-normalization)<br>
+[9. Domain Classification and Dispute Resolution](#9-domain-classification-and-dispute-resolution)<br>
+[10. Protocol Governance](#10-protocol-governance)<br>
+[11. Ledger Architecture and Logging Mechanism](#11-ledger-architecture-and-logging-mechanism)<br>
+[12. Risks and Mitigation Strategies](#12-risks-and-mitigation-strategies)<br>
+[13. Glossary of Terms](#13-glossary-of-terms)<br>
+
+### The Problem: When AI Agents Run the World
+
+It's 2030. You wake up to a world humming with invisible intelligence. Your personal AI agent—part confidant, part strategist—has already negotiated your morning meeting, optimized your commute, and filtered your news to match your values. Every person, business, and government is powered by these tireless digital minds, each one shaping reality in subtle, profound ways.
+
+But beneath the surface, cracks are spreading. Agents clash over conflicting rules. A city's transit grinds to a halt as rival AIs can't agree on traffic priorities. A hospital's care bots argue over patient data privacy, stalling urgent treatment. Financial markets shudder as trading agents exploit protocol loopholes. Trust fractures, and the systems we depend on teeter on the edge of chaos.
+
+Why? Because there's no universal language for trust, reputation, or arbitration between these agents. Each follows its own logic, its own code of conduct—leaving society vulnerable to misalignment, manipulation, and cascading failures.
+
+The solution: a Universal Agent Protocol (UAP). A shared foundation that lets every AI—no matter who built it—prove its trustworthiness, resolve disputes, and collaborate safely. This specification is the blueprint for that protocol: DESTIN.
 
 ## 1. Introduction
 
@@ -894,3 +923,16 @@ This glossary defines all key acronyms, components, and technologies referenced 
 | **Trait Saturation**     | Diminishing returns for overscoring traits                |
 | **Influence Score**      | Weighted sum of ARF traits used to determine agent impact |
 | **Append-Only Logs**     | Immutable, signed records of interactions and events      |
+
+## Contributing
+
+Contributions, suggestions, and feedback are welcome! To propose changes or improvements:
+- Fork the repository and create a pull request
+- Open an issue for discussion
+- For major changes, please start a DESTIN Improvement Proposal (DIP) as described in Section 10
+
+For questions or to get involved, please contact the maintainers or open a discussion on GitHub.
+
+---
+
+> **Note:** This specification is a draft and subject to change. Please check for updates and participate in the governance process.
