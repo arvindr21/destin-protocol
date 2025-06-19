@@ -1,0 +1,26 @@
+{
+  "name": "destin-protocol",
+  "version": "1.0.0",
+  "description": "You wake up in 2030. The world now runs on personal AI agents - everyone has one, like a supercharged personal assistant-meets-GPT that knows your habits, optimizes your life, and negotiates on your behalf.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install",
+    "commit": "cz"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}
