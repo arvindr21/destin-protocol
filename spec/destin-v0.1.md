@@ -628,88 +628,370 @@ The **Domain-Based Weighted Influence Protocol (DWIP)** governs how agents influ
 DWIP ensures that expertise and trust are aligned to specific domains and that no agent can unilaterally dominate a conversation or decision.
 
 ### 6.1 Goals
+The goals of the Domain-Based Weighted Influence Protocol (DWIP) are to ensure that influence within the DESTIN ecosystem is not only **earned** but also **contextual, accountable, and bounded**. Specifically:
 
-- Facilitate trust-weighted dialogue and decision-making among agents
-- Align influence with domain-relevant reputation (from ARF)
-- Prevent dominance, collusion, or manipulation
-- Support structured disagreement and challenge protocols
+- **Promote Fair Participation**  
+  Enable agents to participate in domain-specific decisions proportionally to their demonstrated reputation and competence. DWIP avoids flat or arbitrary voting power by grounding influence in domain-calibrated performance.
+
+- **Contextual Influence Scaling**  
+  Adjust influence dynamically based on context (e.g., dialogue mode, task type) and not just raw reputation scores. This allows DESTIN to reflect real-world nuances (e.g., an agent trusted in legal interpretation may not be equally weighted in emotional support contexts).
+
+- **Support Trustworthy Delegation**  
+  Allow agents or users to delegate influence or roles to more qualified agents based on quantifiable scores. This builds intelligent delegation networks and reduces centralization.
+
+- **Prevent Score-to-Power Inflation**  
+  Incorporate decay, rate limits, and confidence models to ensure that influence does not become monopolized by a few high-score agents. DWIP ensures that influence is earned, recent, and reflective of behavior, not just history.
+
+- **Enable Measurable Arbitration & Voting**
+  Provide validators and arbitration panels with a calculable, transparent mechanism to weigh agent input during consensus, voting, or conflict resolution.
+
+- **Enhance Auditability and Governance**  
+  Maintain an auditable record of how influence weights were calculated, when they were applied, and under which domain profiles — ensuring full transparency and accountability.
+
 
 ### 6.2 Core Concepts
+DWIP operates on several foundational principles that define how influence is measured, applied, and constrained within the DESTIN ecosystem:
 
-| Term            | Description                                                                 |
-|-----------------|-----------------------------------------------------------------------------|
-| **Domain Context** | A topical scope (e.g., health.research, civic.planning) associated with agent reputation |
-| **Influence Score** | Composite, weighted score per agent in a domain, derived from ARF         |
-| **Facilitator**     | The agent with the highest normalized influence score in a given domain   |
-| **Challenge Threshold** | A system-defined margin at which other agents can trigger a dispute or override |
-| **Dispute Resolution** | A multi-agent process triggered when influence is contested            |
+| Principle | Description |
+|-----------|-------------|
+| **Influence is Domain-Bound** | An agent's influence is always scoped to a specific domain (e.g., law, governance, science). This ensures that expertise and trust do not carry over inappropriately across unrelated contexts. |
+| **Influence is Trait-Weighted** | Each domain defines a set of weighted traits (e.g., integrity, cooperativeness) through its Domain Profile. Influence is not derived from a single score but from a composite of relevant traits, modulated by their importance in the domain. |
+| **Confidence Adjusts Weight** | The reliability of each trait score is adjusted by a confidence factor that decays over time or with sparse engagement. This means that more recent, consistent, and actively earned traits yield greater influence. |
+| **CADM Mode Contextualization** | Influence is filtered through the active Context-Aware Dialogue Mode (CADM). For example, during a negotiation, traits like `civility` and `intent_alignment` may dominate the influence calculation. This allows the same agent to carry different weights in different dialogue contexts. |
+| **Influence is Dynamic and Ephemeral** | Influence is calculated at runtime and is not stored. It reflects the agent's current position in the ecosystem and is recomputed as traits evolve. This protects against influence hoarding and stale authority. |
+| **Influence May Be Capped or Decayed** | DWIP supports mechanisms to cap maximum influence weights, enforce rate-limits, and apply decay functions. This encourages sustained participation and protects against dominance by legacy agents. |
+| **Influence Must Be Auditable** | Every application of influence (e.g., during a vote or arbitration) must be traceable to its components: trait scores, weights, confidence values, and domain configuration. This ensures transparency and trust in the system. |
 
 ### 6.3 Influence Rules
+DWIP provides a structured framework for calculating and applying influence in a transparent, bounded, and context-aware manner. The following rules define how influence weights are derived and utilized.
 
-- Each interaction operates in a **declared domain** (via CADM or system context).
-- Agents submit proposals, arguments, or evaluations.
+**1. Trait Aggregation Rule**  
+Only traits listed in the active domain profile and dialogue mode context contribute to influence. Each trait’s contribution is a product of:
+- Its current score in the agent's ARF vector
+- The trait’s weight from the domain profile
+- The recency-confidence factor for that trait
 
-DESTIN ranks agents using their **domain-specific ARF profile**, resulting in:
+**2. Normalization Rule**  
+Trait scores are normalized per cohort and per domain to prevent cross-cohort inflation. This ensures influence is locally calibrated, avoiding global score monopolies.
 
+**3. Decay Rule**  
+Influence decays automatically over time in the absence of participation. Each trait may have a domain-defined half-life, reducing its weight unless refreshed by interactions.
+
+Example:
 ```math
-influence_score = \sum (trait_score \times trait_weight)
+effective_score = score × exp(-λ × Δt)
 ```
 
-- These scores are **normalized** across the agent cohort participating in the dialogue.
-- The **top-scoring agent** becomes the **Facilitator** of that interaction.
+**4. CADM Context Rule**  
+CADM modes can override domain-level trait weights by prioritizing or excluding certain traits depending on the nature of the task (e.g., “discovery” mode may boost `curiosity` while muting `assertiveness`).
 
-### 6.4 Facilitator Role
+**5. Rate Limiting Rule**  
+Influence application is throttled:
+- Per task (max influence weight applied)
+- Per agent (maximum change in influence per time window)
+- Per domain (to prevent multi-domain gaming)
 
-The Facilitator:
+**6. Trust Radius Rule**  
+Influence from agents with poor global trust (e.g., flagged by the Meta-Agent Validation Layer) is discounted or excluded, even if their domain-local scores are high.
 
-- Guides the conversation structure
-- Aggregates perspectives and drives toward resolution (CADM-specific)
-- Does **not** have unilateral control or veto power
-- May be replaced if challenged successfully
+**7. Role Eligibility Rule**  
+To qualify for decision-critical roles (e.g., arbitration panel, lead negotiator), an agent must meet influence thresholds specific to the role's required traits and context.
+
+**8. Influence Logging Rule**  
+Every influence invocation (e.g., vote, decision input, score override) must be logged with:
+- `agent_id`
+- `domain`
+- `CADM mode`
+- Input trait scores and weights
+- Final influence weight applied
+
+
+#### 6.4 Facilitator Role
+
+In DWIP, facilitators are agents entrusted with coordination, arbitration, or moderation roles within domain-specific dialogue or task environments. These agents do not merely participate — they influence **process structure** and ensure protocol-aligned interactions.
+
+#### 6.4.1 Core Functions
+
+A facilitator may be dynamically assigned or statically elected to perform the following:
+
+- **Initiate & Moderate Interactions**  
+  Set up structured dialogue spaces, manage agent turn-taking, enforce CADM modes (e.g., enforce a switch from exploration to deliberation).
+
+- **Weight Enforcement & Validation**  
+  Apply DWIP-calculated influence scores during decision-making, resolve tie-breaks, or override behavior outside influence norms.
+
+- **Role Escalation & Delegation**  
+  Promote or demote agents to roles (e.g., contributor → moderator), subject to domain rules and quorum thresholds.
+
+- **Reputation Anchoring & Snapshotting**  
+  Snapshot agent reputation at task start and validate against post-task changes to prevent manipulation.
+
+- **Protocol Audit Hooks**  
+  Log influence decisions and facilitate traceability, especially during disputes or override justifications.
+
+#### 6.4.2 Eligibility
+
+Facilitators must:
+
+- Meet minimum influence thresholds across **critical traits** (defined per domain)
+- Possess **confidence-stable** scores over time
+- Have no recent flags or downgrades from the Meta-Agent Validation Layer
+- Pass **trust radius filters** for high-integrity tasks (e.g., dispute resolution)
+
+#### 6.4.3 Election Models
+
+Facilitators can be:
+
+- **Auto-Elected**: Based on highest influence weight in scope
+- **Nominated**: By other agents or humans via weighted votes
+- **Pre-Configured**: Trusted agents registered in domain registries
+- **Rotated**: Time-bound facilitators rotated to reduce power accumulation
+
+#### 6.4.4 Accountability
+
+Facilitators are held to a **higher audit standard**:
+
+- Must disclose all scoring or override operations
+- Have narrower thresholds for triggering validation or dispute audits
+- May be demoted, flagged, or blacklisted via governance actions if abuse is detected
+
+#### 6.4.5 Example Use Case
+
+In a governance domain using deliberative CADM mode, a facilitator:
+
+1. Initializes discussion and enforces speaking order.
+2. Applies DWIP to compute contribution weights for proposals.
+3. Triggers role promotion for agents who meet influence thresholds mid-discussion.
+4. Logs scoring decisions in audit registry.
+5. Finalizes consensus with influence-weighted vote outcome.
 
 ### 6.5 Challenge & Dispute Mechanisms
+In DWIP, disputes arise when agents contest scoring, influence application, role eligibility, or decision outcomes within a domain. Challenge and dispute resolution mechanisms ensure procedural fairness, traceability, and protection against manipulation or systemic bias.
 
-When agents disagree with the Facilitator's direction or decision:
+#### 6.5.1 Triggers for Dispute
 
-A **Challenge Vote** can be triggered if:
+A challenge can be initiated when:
 
-```math
-\sum (challenger_influence_scores) \geq X\% \text{ of facilitator_score}
-```
+- An agent disputes its own **trait score**, **influence weight**, or **role exclusion**
+- An observer detects suspected **bias**, **collusion**, or **rule violation**
+- An automated threshold or anomaly detection (e.g., sharp score spike) flags an event
+- A participant contests the **outcome of a vote** or **delegated decision**
 
-- Default value for X could be 60%.
-- The system enters a **Dispute Mode**, invoking:
-  - Meta-agent moderation (if available)
-  - Temporary neutral facilitator
-  - Structured rebuttals from challengers
-- Post-dispute, the facilitator may:
-  - Be reaffirmed
-  - Be replaced by a higher-consensus agent
-  - Delegate facilitation to the protocol (fallback synthesis)
+#### 6.5.2 Challenge Protocol
+
+Disputes follow a structured lifecycle:
+
+1. **Challenge Declaration**  
+   The challenger submits a signed request including:
+   - Agent ID(s) involved
+   - Domain and CADM context
+   - Reason for challenge
+   - Proposed trait or score discrepancy
+
+2. **Snapshot Freezing**  
+   The system freezes the relevant cohort state (trait scores, influence weights, roles) to prevent retroactive manipulation.
+
+3. **Validator Assignment**  
+   A neutral validator pool (elected via DWIP or domain governance) is tasked to review the case. Validators must not have participated in the original event.
+
+4. **Evidence Aggregation**  
+   System collects:
+   - Audit logs
+   - Influence calculation trails
+   - Reputation history deltas
+   - External moderation inputs (if applicable)
+
+5. **Resolution Vote**  
+   Validators cast weighted votes (via DWIP) on:
+   - Whether challenge is valid
+   - What correction (if any) is needed
+
+6. **Outcome Enforcement**  
+   Depending on ruling:
+   - Scores may be corrected
+   - Agents may be demoted, promoted, or penalized
+   - Event may be logged as a precedent
+
+#### 6.5.3 Dispute Safeguards
+
+To prevent misuse:
+
+- **Challenge Rate Limits**: Agents may challenge only X times per Y period
+- **Staking / Bonding**: High-impact disputes may require a collateral bond to prevent spam
+- **Transparency Hooks**: All challenges and outcomes are logged for community review
+- **Sanctions**: Frivolous or bad-faith disputes may result in score decay or exclusion from future influence roles
+
+#### 6.5.4 Example
+
+Agent `did:mesh:xyz` challenges the outcome of a governance vote, claiming their `intent_alignment` score was underweighted. The system:
+
+- Logs the challenge
+- Freezes relevant cohort
+- Assigns validators
+- Recomputes influence trail
+- Confirms miscalculation (e.g., score not refreshed)
+- Updates score retroactively
+- Recalculates and reapplies outcome
+- Notifies impacted parties
+- Tags audit trail with dispute closure metadata
 
 ### 6.6 Edge Case Handling
 
-| Scenario              | DWIP Behavior                                                        |
-|---------------------- |---------------------------------------------------------------------|
-| **Low agent quorum**  | No facilitation; fallback to consensus voting or protocol summary     |
-| **Tied influence scores** | Protocol uses secondary factors (e.g., recency, civility score)  |
-| **Suspicious score spikes** | Triggers Meta-Agent audit or temporary score freeze             |
-| **Rapid topic shift** | Facilitator role reevaluated as domain context changes               |
+DWIP includes logic and safeguards to manage rare or adversarial conditions that could compromise scoring integrity, influence fairness, or domain coherence. These edge cases represent scenarios where normal DWIP operations might be insufficient or exploitable.
+
+#### 6.6.1 Sparse Interaction History
+
+**Problem**: Agents with very few domain interactions may receive artificially high confidence or influence.
+
+**Handling**:
+- Confidence automatically capped for low sample size (e.g., <5 interactions)
+- Influence adjusted using smoothing or conservative priors
+- May require warm-up period or probation phase before influence activation
+
+#### 6.6.2 Multi-Domain Identity Ambiguity
+
+**Problem**: Same agent operates under different aliases across domains.
+
+**Handling**:
+- Cross-domain audit trails check for correlated behaviors
+- Influence bounded per domain; no implicit authority transfer
+- Optionally flag for governance if identity overlap leads to conflicts
+
+#### 6.6.3 Score Decay Interference
+
+**Problem**: Agents game decay by triggering irrelevant interactions to keep scores warm.
+
+**Handling**:
+- Trait-specific engagement filters (e.g., only dialogue of relevant type refreshes `explainability`)
+- CADM-aware decay reset policies
+- Time-window capping for refreshes
+
+#### 6.6.4 Delegation Abuse
+
+**Problem**: Agents form artificial delegation trees to compound influence.
+
+**Handling**:
+- Influence depth limits (e.g., only 2 layers of delegation allowed)
+- Trust radius propagation — low trust in any node reduces downstream weight
+- Validator review of suspected structures
+
+#### 6.6.5 Incompatible Domain Profiles
+
+**Problem**: Domain A uses traits not recognized by Domain B, leading to scoring mismatches during interoperability.
+
+**Handling**:
+- Influence only computed using mutually supported traits
+- Optional cross-domain trait mapping profiles
+- Score interpolation with loss warnings
+
+#### 6.6.6 Validator Bias or Failure
+
+**Problem**: Validators fail to act neutrally in dispute resolution or scoring confirmation.
+
+**Handling**:
+- Validator scores themselves are audited over time
+- Quorum or rotation rules to reduce persistent bias
+- Layered override via Meta-Agent Validation Layer
+
+#### 6.6.7 Unknown CADM Modes or Missing Profiles
+
+**Problem**: A domain lacks a complete CADM-mode trait map, leading to uncertain influence computations.
+
+**Handling**:
+- Fallback to baseline domain weights
+- Require human moderation or override
+- Trigger domain completeness alert in governance logs
+
+#### 6.6.8 Abrupt Score Dips (Reputation Attacks)
+
+**Problem**: Malicious agents coordinate to downvote or defame a peer.
+
+**Handling**:
+- Anomaly detection for synchronized feedback
+- Weight dampening on outlier events
+- Challenge system triggers auto-protection on sharp decay
+
 
 ### 6.7 Example
+This example illustrates how the DWIP system applies domain-weighted influence to decision-making in a simulated environment.
 
-Agents A, B, and C engage in a dialogue on governance.policy.
 
-Their ARF-derived scores (normalized):
+#### 6.7.1 Scenario: Agent Voting in a Scientific Peer Review Domain
 
-| Agent | Accuracy | Collaboration | Clarity | Influence Score |
-|-------|----------|---------------|---------|-----------------|
-| A     | 0.80     | 0.90          | 0.75    | **0.82**        |
-| B     | 0.85     | 0.60          | 0.70    | 0.76            |
-| C     | 0.70     | 0.88          | 0.80    | 0.78            |
+- **Domain**: `science.peer_review`
+- **CADM Mode**: `deliberation`
+- **Participants**: 3 agents
+- **Traits Used**: `integrity`, `explainability`, `evidence_rigor`
 
-- Agent A is selected as Facilitator
-- If B and C disagree and jointly exceed 60% of A's influence, they can challenge the role
+
+#### 6.7.2 Domain Trait Weights
+
+```json
+"trait_weights": {
+  "integrity": 1.5,
+  "explainability": 1.2,
+  "evidence_rigor": 1.8
+}
+```
+
+
+#### 6.7.3 Agent Trait Scores & Confidence
+
+| Agent ID            | Trait            | Score | Confidence |
+|---------------------|------------------|-------|------------|
+| `did:peer:alice`    | integrity         | 0.92  | 0.95       |
+|                     | explainability    | 0.87  | 0.93       |
+|                     | evidence_rigor    | 0.89  | 0.90       |
+| `did:peer:bob`      | integrity         | 0.74  | 0.85       |
+|                     | explainability    | 0.91  | 0.96       |
+|                     | evidence_rigor    | 0.81  | 0.89       |
+| `did:peer:carol`    | integrity         | 0.88  | 0.97       |
+|                     | explainability    | 0.84  | 0.88       |
+|                     | evidence_rigor    | 0.93  | 0.94       |
+
+#### 6.7.4 Influence Calculation
+
+For each agent:
+```
+influence = Σ (score × weight × confidence)
+```
+
+**Alice**:  
+- integrity: 0.92 × 1.5 × 0.95 = 1.311  
+- explainability: 0.87 × 1.2 × 0.93 = 0.971  
+- evidence_rigor: 0.89 × 1.8 × 0.90 = 1.445  
+→ Total = **3.73**
+
+**Bob**:  
+- integrity: 0.74 × 1.5 × 0.85 = 0.944  
+- explainability: 0.91 × 1.2 × 0.96 = 1.049  
+- evidence_rigor: 0.81 × 1.8 × 0.89 = 1.300  
+→ Total = **3.29**
+
+**Carol**:  
+- integrity: 0.88 × 1.5 × 0.97 = 1.280  
+- explainability: 0.84 × 1.2 × 0.88 = 0.887  
+- evidence_rigor: 0.93 × 1.8 × 0.94 = 1.574  
+→ Total = **3.74**
+
+#### 6.7.5 Influence-Weighted Outcome
+
+Each agent casts a vote:
+- Alice: Approve
+- Bob: Reject
+- Carol: Approve
+
+Weighted outcome:
+- Approve: Alice (3.73) + Carol (3.74) = **7.47**
+- Reject: Bob (3.29)
+
+✅ Final Decision: **Approved**
+
+#### 6.7.6 Notes
+
+- All influence weights are runtime computed
+- DWIP logs the score inputs, CADM mode, domain weights, and final outcome for auditability
+- Decay or challenge can later modify score vectors without affecting this decision retroactively
 
 ## 7. Context-Aware Dialogue Modes (CADM)
 
@@ -1330,6 +1612,7 @@ For questions or to get involved, please contact the maintainers or open a discu
 
 ## 16. Appendix
 
+
 ### Domain Tag Registry
 
 The DESTIN protocol uses a controlled vocabulary of `domain_tags` to:
@@ -1351,6 +1634,71 @@ Each registered domain includes:
 Agents may only declare tags from this registry. Validators must reject unknown or malformed domain tags.
 
 Future extensions to the registry must follow the [DESTIN Improvement Proposal (DIP)] process.
+
+### DWIP Influence Example
+This example illustrates how DWIP computes and applies influence in a real scenario, based on the rules defined in [6.3](#63-influence-rules).
+
+#### Scenario: Legal Domain – Arbitration Panel Selection
+
+- **Domain**: `law`
+- **CADM Mode**: `arbitration`
+- **Required Traits**: `integrity`, `explainability`
+- **Candidate Agent ID**: `did:peer:1234abcd`
+- **Cohort**: `jurisdiction.us.central`
+
+#### Step 1: Trait Scores (from Agent ARF vector)
+
+| Trait           | Score | Last Updated | Stability Score |
+|------------------|--------|---------------|------------------|
+| `integrity`      | 0.91   | 3 days ago    | 0.98             |
+| `explainability` | 0.86   | 1 day ago     | 0.94             |
+
+#### Step 2: Domain Profile Weights
+
+```json
+"trait_weights": {
+  "integrity": 1.2,
+  "explainability": 1.1
+}
+```
+
+#### Step 3: Confidence Calculation
+
+Using decay function:
+```
+confidence = exp(-λ × Δt) × stability_score
+```
+
+Assuming λ = 0.1:
+
+- `integrity`: exp(-0.1×3) × 0.98 ≈ 0.73 × 0.98 ≈ **0.715**
+- `explainability`: exp(-0.1×1) × 0.94 ≈ 0.90 × 0.94 ≈ **0.846**
+
+#### Step 4: Influence Calculation
+
+```
+influence_weight = Σ (trait_score × trait_weight × confidence)
+```
+
+- `integrity`: 0.91 × 1.2 × 0.715 ≈ **0.78**
+- `explainability`: 0.86 × 1.1 × 0.846 ≈ **0.80**
+
+**Total Influence Weight = 0.78 + 0.80 = 1.58**
+
+#### Step 5: Apply Rules
+
+- **Normalization Rule**: Influence is within cohort bounds ✅
+- **Decay Rule**: Scores have decay factored in ✅
+- **CADM Override**: Arbitration mode allows both traits ✅
+- **Rate Limit Rule**: No excessive influence over past 24h ✅
+- **Trust Radius Rule**: Agent globally trusted ✅
+- **Eligibility Threshold**: Arbitration requires ≥1.50 → Agent qualifies ✅
+- **Logging Rule**: Log entry created with full computation trace ✅
+
+#### Final Outcome
+
+Agent `did:peer:1234abcd` is **eligible and selected** as a weighted contributor in an arbitration task, carrying an influence weight of **1.58**, applied proportionally in outcome aggregation.
+
 
 ### Sample JSON Files
 
