@@ -666,9 +666,9 @@ DWIP operates on several foundational principles that define how influence is me
 DWIP provides a structured framework for calculating and applying influence in a transparent, bounded, and context-aware manner. The following rules define how influence weights are derived and utilized.
 
 **1. Trait Aggregation Rule**  
-Only traits listed in the active domain profile and dialogue mode context contribute to influence. Each trait’s contribution is a product of:
+Only traits listed in the active domain profile and dialogue mode context contribute to influence. Each trait's contribution is a product of:
 - Its current score in the agent's ARF vector
-- The trait’s weight from the domain profile
+- The trait's weight from the domain profile
 - The recency-confidence factor for that trait
 
 **2. Normalization Rule**  
@@ -998,63 +998,353 @@ Weighted outcome:
 The **Context-Aware Dialogue Modes (CADM)** system enables agents in DESTIN to dynamically adapt their communication strategy based on the nature of the domain or topic under discussion. CADM is essential for ensuring that dialogue protocols are aligned with epistemic constraints - whether a topic is factual, interpretive, or contested.
 
 ### 7.1 Goals
+The goals of Context-Aware Dialogue Modes (CADM) are to ensure that agent communication is context-sensitive, trust-calibrated, and epistemically aligned. Specifically, CADM enables agents to adapt their dialogue behavior based on the nature of the topic, promoting coherence, fairness, and interpretability across knowledge domains.
 
-- Tailor dialogue structure to the knowledge type being discussed
-- Ensure productive, structured, and trust-aligned conversations
-- Enable runtime switching of dialogue modes as contexts shift
-- Support disagreement handling through meta-debate mechanisms
+- **Align dialogue structure with epistemic intent**: Ensure that agent exchanges are shaped by the type of knowledge involved—whether factual (objective), interpretive (subjective), or contested (ambiguous)—to improve accuracy, relevance, and social compatibility.
+- **Enable structured, trust-weighted discourse**: Facilitate productive interactions by embedding dialogue within a formal mode, governed by DWIP-weighted influence and ARF-derived behavioral norms. This ensures high-reputation agents shape outcomes proportionally, not arbitrarily.
+- **Support runtime mode inference and switching**: Allow agents or system validators to dynamically adjust the dialogue mode in response to domain shifts, conflict triggers, or topic transitions. Mode reassignment is protocol-governed and may be triggered manually or inferred automatically.
+
+- **Operationalize disagreement through meta-debate**: Provide agents with a structured mechanism for contesting the dialogue mode or domain classification itself. This includes:
+  - Issuing a mode challenge
+  - Exchanging structured rationales
+  - Invoking influence-weighted voting to resolve the dispute
+
+- **Integrate with domain semantics and scoring protocols**: CADM modes must interoperate with:
+  - DWIP: to alter trait weighting during influence calculations
+  - ARF: to adjust trait impact during dialogue evaluation
+  - Domain Registry: to align with default CADM modes and classification volatility scores
+
+- **Preserve auditability and epistemic traceability**: Each mode transition, challenge, or override must be logged with justification, participating agent IDs, and confidence-weighted outcomes. This provides a verifiable trail of dialogue structure evolution.
 
 ### 7.2 Dialogue Mode Classification
 
-| Mode         | Domain Type | Description                                 | Expected Outcome                |
-|--------------|-------------|---------------------------------------------|---------------------------------|
-| **Resolution** | Objective   | For factual, measurable, or verifiable domains | Consensus or best-candidate answer |
-| **Synthesis**  | Subjective  | For opinion-driven, interpretive, or value-based domains | Merged viewpoint or plural synthesis |
-| **Debate**     | Ambiguous   | For contested or unclear domains with no immediate resolution | Rebuttals, position clarity, deferral to governance |
+Each DESTIN dialogue occurs within a CADM mode, which defines the interaction structure, behavioral expectations, and influence weighting strategy. Dialogue modes are selected based on the epistemic nature of the domain and may be reclassified at runtime based on agent input or protocol triggers.
 
-Dialogue modes may be auto-inferred or defaulted based on an agent's declared domain_tags. For example, an agent operating in the science domain defaults to objective mode, while arts defaults to subjective.
+| Mode         | Domain Type | Description                                           | Typical Outcome             |
+|--------------|-------------|-------------------------------------------------------|-----------------------------|
+| **Resolution** | Objective   | Factual, measurable, and verifiable                  | Correct answer or consensus |
+| **Synthesis**  | Subjective  | Value-driven, interpretive, or preference-based      | Merged or plural viewpoint  |
+| **Debate**     | Ambiguous   | Contested, underdefined, or epistemically unstable   | Position clarity or deferral |
+
+#### 7.2.1 Trait Alignment by Mode
+
+Trait weighting during influence and scoring may be modified when a dialogue mode is active. The following table outlines recommended trait priorities:
+
+| Mode         | Prioritized Traits                                |
+|--------------|---------------------------------------------------|
+| Resolution   | `accuracy`, `transparency`, `clarity`             |
+| Synthesis    | `empathy`, `civility`, `humility`, `helpfulness`  |
+| Debate       | `explainability`, `consistency`, `neutrality`     |
+
+> Trait weights may override domain profile defaults when a CADM mode is activated dynamically.
+
+#### 7.2.2 Default Mode Assignment
+
+Each domain in the DESTIN Domain Registry must specify a `default_mode`. For example:
+
+```yaml
+- domain: science.peer_review
+  default_mode: resolution
+  volatility_score: 0.10
+```
+
+- `default_mode`: The CADM mode applied when agents do not contest classification
+- `volatility_score`: A normalized indicator (0.0-1.0) of how often a domain shifts classification due to disagreement
+
+Domains with high `volatility_score` are more likely to trigger **meta-debate** (see §7.5) when agents propose alternate classifications during dialogue.
+
+#### Behavioral Signatures
+
+To aid agent modeling and protocol interpretability, each dialogue mode is associated with a set of behavioral expectations:
+
+| Mode         | Agent Behavior Examples                                                 |
+|--------------|-------------------------------------------------------------------------|
+| Resolution   | “Here's the evidence.”<br>“I calculated X.”<br>“Let's converge on an answer.” |
+| Synthesis    | “I see your view.”<br>“Can we blend A and B?”<br>“Let's build on that.”       |
+| Debate       | “I disagree because…”<br>“That's inconsistent with…”<br>“We need to escalate.” |
+
+> Behavioral signatures are non-normative but useful for training, moderation, and audit tooling.
+
+Dialogue modes may be auto-inferred or defaulted based on an agent's declared `domain_tags`. For example, an agent operating in the science domain defaults to objective mode, while arts defaults to subjective.
 
 Mappings are defined in the [domain-tags registry](./domain-tags.md) to ensure consistency between CADM and ARF layers.
 
 ### 7.3 Mode Selection Logic
+CADM mode selection determines how agents structure their interactions. DESTIN supports dynamic mode selection based on epistemic context, agent input, and meta-agent governance. This section defines the function, inputs, and resolution logic for selecting and reclassifying dialogue modes.
 
-- At dialogue start, the system infers domain type from:
-  - Declared domain metadata (e.g., science.research)
-  - Past interactions in the same topic
-  - Agent voting or Meta-Agent classification
-- If agents disagree on the domain type, a **meta-debate** is initiated
+#### 7.3.1 Mode Selection Function
+
+```ts
+function select_mode(context: DialogueContext): CADM_Mode
+```
+
+Where `DialogueContext` is an object including:
+
+```json
+{
+  "domain_tag": "science.peer_review",
+  "agent_votes": {
+    "agent1": "resolution",
+    "agent2": "synthesis"
+  },
+  "meta_agent_flag": false,
+  "recent_mode": "resolution",
+  "volatility_score": 0.1
+}
+```
+
+#### 7.3.2 Mode Selection Inputs
+
+| Input Source       | Description                                                              |
+|--------------------|---------------------------------------------------------------------------|
+| **Domain Metadata**| The `default_mode` as declared in the Domain Tag Registry                |
+| **Agent Voting**   | Weighted influence vote (via DWIP) from all participating agents         |
+| **Interaction History** | Past dialogue modes used for this topic or domain                   |
+| **Meta-Agent Classification** | Override or adjustment from high-reputation validators       |
+
+#### Mode Reassessment Triggers
+
+| Trigger Source     | Condition                                                                 |
+|--------------------|---------------------------------------------------------------------------|
+| **Agent Signal**   | Agent issues a `propose_mode_change()` request with rationale             |
+| **Topic Shift**    | Detected domain tag transition (e.g., `law.contract` → `ethics.ai`)       |
+| **Volatility Trigger** | Domain `volatility_score` exceeds threshold or oscillates frequently  |
+| **Meta-Agent Audit** | Systemic misclassification or manipulation is flagged                  |
+
+#### 7.3.3 Tie-Breaking and Conflict Resolution
+
+If agent votes are split or low confidence is detected:
+
+- Default to domain's `default_mode` if no quorum is reached
+- Use ARF-weighted voting to resolve ties
+- Allow meta-agents to override in case of systemic ambiguity
+- Log decision trace for auditability
+
+#### 7.3.4 Mode Selection Audit Log Format
+
+```json
+{
+  "event": "mode_selection",
+  "trigger": "agent_vote",
+  "selected_mode": "resolution",
+  "votes": {
+    "agent1": "resolution",
+    "agent2": "synthesis"
+  },
+  "confidence_score": 0.78,
+  "timestamp": "2025-07-01T12:00:00Z"
+}
+```
+
+> All mode selection events MUST be committed to the append-only event log with appropriate signatures and resolution traceability.
 
 ### 7.4 Runtime Switching
 
-Dialogue modes may change mid-session if:
+Dialogue mode transitions may occur mid-session in response to topic changes, agent signals, or Meta-Agent overrides. DESTIN supports runtime switching of CADM modes to maintain epistemic alignment and conversational integrity.
 
-- The topic shifts domains (e.g., from factual to normative)
-- Agents trigger a **Mode Reassessment Signal**
-- A Meta-Agent audit flags misclassification
+#### 7.4.1 Mode Switching Triggers
 
-Switching protocol:
+A mode switch may be initiated by:
 
-1. Freeze current thread
-2. Retag new domain type
-3. Re-initiate dialogue under new mode
-4. Preserve past transcript with timestamped boundaries
+| Trigger Source       | Condition                                                                 |
+|----------------------|---------------------------------------------------------------------------|
+| **Agent Proposal**    | `propose_mode_change()` signal submitted and seconded by another agent    |
+| **Domain Tag Shift**  | System detects a change in topic domain (e.g., `governance.policy` → `ethics.ai`) |
+| **Volatility Spike**  | Domain volatility score exceeds threshold                                 |
+| **Meta-Agent Audit**  | Override issued due to detected misclassification or protocol abuse       |
+
+#### 7.4.2 Trigger Evaluation Function
+
+```ts
+function trigger_mode_switch(new_domain: string, signal_source: Agent | System): boolean
+```
+
+The system evaluates context against:
+- Agent consensus or quorum
+- Historical domain-mode pairings
+- Scoring volatility or anomalies
+- Meta-Agent override rules
+
+#### 7.4.3 Mode Switching Protocol
+
+1. **Freeze Current Thread**
+   - Dialogue is temporarily halted
+   - Transcript and interaction context are snapshotted
+   - Current DWIP weights and ARF updates are paused
+
+2. **Retag and Reclassify**
+   - Domain is reassessed (if changed)
+   - New CADM mode is inferred using `select_mode()`
+
+3. **Reinitialize Dialogue**
+   - New mode structure is activated
+   - Facilitation roles may be reassigned based on updated influence
+   - Agents are notified via `mode_switch_event`
+
+4. **Resume Dialogue**
+   - History is preserved and time-bounded
+   - New contributions are evaluated using updated scoring and CADM semantics
+
+#### 7.4.4 Mode Switch Log Format
+
+Every runtime switch MUST be logged with full context:
+
+```json
+{
+  "event": "cadm_mode_switch",
+  "from_mode": "synthesis",
+  "to_mode": "debate",
+  "reason": "topic shift to ethics domain",
+  "triggered_by": "did:peer:1234abcd",
+  "timestamp": "2025-07-01T12:03:45Z"
+}
+```
+
+> Logs must be committed to the append-only ledger to support auditability, replay, and post-hoc governance.
+
+#### 7.4.5 Notes on Persisted State
+
+| Component            | Persists Across Switch? | Notes                                          |
+|----------------------|-------------------------|------------------------------------------------|
+| Dialogue History      | ✅ Yes                  | Preserved as frozen transcript with timestamp  |
+| ARF Scores            | ✅ Yes                  | No score reset; same agent record persists     |
+| DWIP Influence        | ⚠️ Recomputed           | Influence recalculated using new trait weights |
+| Facilitator Role      | ⚠️ May rotate           | Based on updated influence scores              |
+| Meta-Agent Flags      | ✅ Yes                  | Inherited and carried into next mode instance  |
+
+> Runtime switching ensures dialogue coherence while preserving trust semantics and verifiable transitions.
 
 ### 7.5 Meta-Debate Protocol
+When agents disagree on the current dialogue mode or domain classification, they enter a **meta-debate**. This structured sub-dialogue allows agents to justify, challenge, and resolve epistemic disagreements without derailing the main conversation.
 
-When agents disagree on the mode (or domain), they enter a **meta-debate**:
+#### 7.5.1 Meta-Debate Lifecycle
 
-| Phase      | Purpose                                   | Trigger                |
-|------------|-------------------------------------------|------------------------|
-| **Round 1**| Agent 1 proposes domain type with rationale | Agent declares intent  |
-| **Round 2**| Agent 2 rebuts and offers counter-domain    | Opposing agent contests|
-| **Vote**   | All agents vote on most appropriate mode (vote weighted by ARF influence) | Vote weighted by ARF influence |
-| **Outcome**| Protocol selects dominant mode OR splits into parallel dialogues |                        |
+| Phase       | Purpose                                       | Trigger                          |
+|-------------|-----------------------------------------------|----------------------------------|
+| **Proposal**| Agent A proposes a new domain or dialogue mode | Issues `propose_mode_change()`  |
+| **Rebuttal**| Agent B contests the proposal with justification | Submits counter-proposal        |
+| **Voting**  | All participating agents vote on best-fit mode | Votes are DWIP-weighted         |
+| **Outcome** | Protocol applies highest-weighted result       | Transcript is preserved          |
+
+#### 7.5.2 Voting Mechanics
+
+- Each agent casts a vote for one of the proposed modes
+- Votes are **influence-weighted** via DWIP using current trait scores
+- Optional abstention is allowed (zero influence contribution)
+- The winning mode must exceed the **decision quorum threshold** (e.g., ≥60% weighted approval)
+
+If quorum is not reached:
+- Default to domain's `default_mode`
+- Optionally escalate to Meta-Agent council for override
+
+#### 7.5.3 Meta-Debate Transcript Handling
+
+- All exchanges are logged in a `meta_transcript` sub-thread
+- The winning decision is tagged and archived with metadata
+- The resolved mode becomes active for subsequent dialogue turns
+
+#### 7.5.4 Logging Format
+
+```json
+{
+  "event": "meta_debate_resolution",
+  "proposed_by": "did:peer:alpha",
+  "counter_by": "did:peer:beta",
+  "proposed_modes": ["resolution", "synthesis"],
+  "selected_mode": "synthesis",
+  "votes": {
+    "did:peer:alpha": 0.92,
+    "did:peer:gamma": 0.88
+  },
+  "quorum_reached": true,
+  "timestamp": "2025-07-01T12:07:10Z"
+}
+```
+
+> Meta-debate outcomes must be stored in the audit log and linked to the parent dialogue session.
+
+#### 7.5.5 Dispute Escalation
+
+If meta-debate is inconclusive or contested:
+
+- Agents may **escalate** via a signed challenge to the Meta-Agent Validation Layer
+- Meta-Agents review transcripts, score justifications, and render a binding decision
+- Escalations are rate-limited to prevent abuse and logged for governance transparency
+
+#### 7.5.6 Use Case Example
+
+In a dialogue on `governance.policy`, Agent A proposes switching to `debate` mode due to ethical disagreement. Agent B argues it is still a `synthesis` case. A meta-debate is initiated:
+
+1. Both agents submit rationale.
+2. All participants vote.
+3. `synthesis` wins with 67% DWIP-weighted support.
+4. CADM resumes in `synthesis` mode.
+
+> The meta-debate protocol ensures fairness, traceability, and influence-aware dialogue governance.
 
 ### 7.6 Example Scenarios
+The following examples illustrate how CADM adapts dialogue modes based on domain type, topic nature, and agent behavior. Each scenario shows how DESTIN determines the appropriate dialogue structure for trustworthy and epistemically aligned interactions.
 
-- **Medical Diagnosis** → **Resolution Mode** (factual metrics, evidence)
-- **Urban Planning** → **Synthesis Mode** (conflicting values, trade-offs)
-- **Ethics of Autonomous Weapons** → **Debate Mode** (high contestability)
+#### 7.6.1 Scenario 1: Medical Diagnosis
+- **Domain**: `healthcare.clinical`
+- **CADM Mode**: `resolution`
+- **Trigger**: Factual symptom analysis and evidence-based treatment planning
+
+**Agent Behavior:**
+- Cites test results and clinical studies
+- Filters out subjective opinions
+- Prioritizes `accuracy`, `transparency`, `clarity`
+
+**Outcome:**
+- Consensus on best treatment path
+- Audit log reflects evidence trail and score deltas
+
+#### 7.6.2 Scenario 2: Urban Planning Policy
+- **Domain**: `governance.urban`
+- **CADM Mode**: `synthesis`
+- **Trigger**: Conflicting values and stakeholder goals emerge during discussion
+
+**Agent Behavior:**
+- Reframes suggestions in shared terms
+- Acknowledges trade-offs
+- Prioritizes `empathy`, `civility`, `helpfulness`
+
+**Outcome:**
+- Blended recommendations that satisfy multiple constituencies
+- DWIP influence distributed across cooperative agents
+
+#### 7.6.3 Scenario 3: Ethics of Autonomous Weapons
+- **Domain**: `ethics.ai`
+- **CADM Mode**: `debate`
+- **Trigger**: High contestability, unresolved normative conflict
+
+**Agent Behavior:**
+- Articulates strong positions with structured justifications
+- Flags contradictions in peer proposals
+- Prioritizes `explainability`, `consistency`, `neutrality`
+
+**Outcome:**
+- Clear articulation of differing philosophies
+- Final resolution deferred to governance or regulatory body
+
+#### 7.6.4 Scenario 4: Domain Shift Mid-Dialogue
+- **Initial Domain**: `governance.policy` → **New Domain**: `ethics.ai`
+- **Initial Mode**: `synthesis` → **Switched Mode**: `debate`
+- **Trigger**: Topic shifts from cost-benefit trade-offs to moral permissibility
+
+**Protocol Steps:**
+1. Agent proposes mode switch due to domain shift
+2. System triggers reassessment via `trigger_mode_switch()`
+3. CADM mode transitions from `synthesis` to `debate`
+4. Meta-debate held only if agents contest new mode
+
+**Outcome:**
+- Historical transcript preserved
+- New facilitator elected using updated DWIP weights
+- Recalibrated scoring for ongoing dialogue
+
+> These examples demonstrate the practical adaptability and governance robustness of CADM across real-world domains.
+
 
 ## 8. Meta-Agent Validation Layer
 
@@ -1638,7 +1928,7 @@ Future extensions to the registry must follow the [DESTIN Improvement Proposal (
 ### DWIP Influence Example
 This example illustrates how DWIP computes and applies influence in a real scenario, based on the rules defined in [6.3](#63-influence-rules).
 
-#### Scenario: Legal Domain – Arbitration Panel Selection
+#### Scenario: Legal Domain - Arbitration Panel Selection
 
 - **Domain**: `law`
 - **CADM Mode**: `arbitration`
