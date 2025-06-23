@@ -1,0 +1,12 @@
+{
+  "domain": "governance",
+  "default_modes": [
+    "deliberative",
+    "negotiation"
+  ],
+  "trait_weights": {
+    "civility": 1.2,
+    "intent_alignment": 1.15,
+    "cooperativeness": 1.1
+  }
+}
