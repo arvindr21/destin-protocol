@@ -1408,18 +1408,7 @@ Validation councils are ephemeral, domain-aware collectives of elevated agents (
 - **Quorum Agreement**: Decisions require ≥60% consensus; tie-breaking is not permitted.
 - **Voting Threshold**: A quorum must be achieved within a maximum of `Δt = 24 hours` or the decision is marked `undecided` and escalated to a reserve council.
 
-#### 8.2.2 Eligibility Criteria for Meta-Agents
-
-Agents are eligible to participate in a validation council if they meet all the following:
-
-- **ARF Trait Thresholds**:
-  - `integrity ≥ 0.9`
-  - `explainability ≥ 0.85`
-  - domain-specific traits (e.g. `neutrality`, `verifiability`) ≥ domain-defined minimum
-- **Recent Activity**: Must have participated in ≥3 validated interactions in the last 30 days.
-- **Dispute-Free History**: No prior record of being overturned by another council within 90 days.
-
-#### 8.2.3 Council Formation Logic
+#### 8.2.2 Council Formation Logic
 
 Council formation is driven by a deterministic selection algorithm with the following constraints:
 
@@ -1445,60 +1434,342 @@ If quorum cannot be reached (e.g., quorum not met, timeout, non-participation):
 - Repeated failures to form or conclude councils in a given domain trigger a `meta-audit` of domain governance configuration.
 
 
-### 8.3 Core Functions
+### 8.3 Selection Criteria and Rotation Logic
 
-1.  **Audit Scoring Changes**
-    - Detect abnormal score inflation, decay suppression, or manipulation
-    - Freeze scores pending review
-    - Require challenge-response from affected agent
+Meta-agents serve as trust anchors within the DESTIN ecosystem and must be selected based on objective merit, contextual relevance, and systemic diversity. To avoid validator capture, all eligible meta-agents are subject to enforced rotation, tenure limits, and dynamic eligibility reevaluation.
 
-2.  **Dispute Arbitration**
-    - Resolve deadlocked DWIP challenges or CADM mode disagreements
-    - May override facilitator decisions with signed justification
+#### 8.3.1 Selection Criteria for Meta-Agent Candidacy
 
-3.  **Integrity Signaling:**
-    - Emit system-level warnings when agents:
-      - Violate behavior norms
-      - Evade scoring participation
-      - Appear to collude
+An agent may be nominated or promoted to meta-agent status if it meets all of the following:
 
-4.  **Protocol Sanctions (Optional)**
-    - Apply temporary visibility limits, cooldowns, or score freezes
-    - Must be ratified by ≥⅔ of Meta-Agent quorum
+- **ARF Trait Minimums (Global Baseline):**
+  - `integrity ≥ 0.92`
+  - `explainability ≥ 0.88`
+  - `consistency ≥ 0.9` (measured across 50+ interactions)
+  - Stability Score ≥ `0.95`
 
-### 8.4 Operating Procedures
+- **Domain Depth (CADM-Aligned):**
+  - Must hold domain-specific ARF vectors with `≥ 0.9` relevance in at least one CADM-registered domain.
+  - Has served in ≥5 validated interactions (non-meta) within that domain in the last 60 days.
 
-| Trigger Type           | Meta-Agent Action                                 |
-|------------------------|---------------------------------------------------|
-| Reputational anomaly   | Log + audit score source and velocity             |
-| Domain abuse           | Reclassify or restrict access to domain           |
-| Dispute escalation     | Initiate arbitration round and log outcome        |
-| Meta-Debate failure    | Enforce fallback consensus or defer               |
+- **Ledger Health:**
+  - No critical disputes overturned within the last 120 days.
+  - No manipulation flags or quorum bias violations.
 
-Meta-Agents operate based on a **signed policy spec** that can be referenced and versioned across implementations.
+#### 8.3.2 Nomination and Validation Process
 
-### 8.5 Example Policy Snippet
+Meta-agents may be elevated through:
+
+- **DWIP Voting**: High-trust agents cast weighted votes proportional to their influence score.
+- **Protocol Trigger**: An automatic election is triggered when active meta-agent supply drops below quorum floor.
+- **Manual Appeal**: Agents may submit a candidacy request subject to domain governance council review.
+
+All nominations are subject to:
+
+- **Probation Period**: Initial 15-day limited-scope service, restricted to observation or non-critical verdicts.
+- **Evaluation Epoch**: Post-probation scoring reassessment to confirm elevation.
+
+#### 8.3.3 Rotation Logic and Term Limits
+
+To prevent validator stagnation and mitigate influence centralization:
+
+| Rule                                 | Constraint                                      |
+|--------------------------------------|-------------------------------------------------|
+| **Max Consecutive Service Epochs**   | 3 epochs (30 days each), then 1 epoch cooldown |
+| **Concurrent Council Limit**         | 1 council per 7-day window                     |
+| **Domain Reassignment Lock**         | Cannot switch domains more than once per epoch |
+| **Reelection Waiting Period**        | 2 epochs post-expiry before re-nomination      |
+
+- **Stochastic Reselection**: When multiple candidates are equally qualified, random tie-breakers are applied using a verifiable entropy source (e.g., timestamp-seeded VRF).
+- **Agent Ledger Tags**: Each agent’s election history is logged under `meta_agent.lifecycle` with timestamps, role types, and vote records.
+
+#### 8.3.4 Rotation Failure Modes
+
+If a domain lacks sufficient eligible agents:
+
+- **Fallback Pool**: Pull from adjacent domains with overlapping ARF vectors.
+- **Synthetic Injection**: Instantiate temporary meta-agents from the protocol’s synthetic validation pool (if enabled).
+- **Escalation Path**: Flag condition to the Meta-Agent Oversight Layer (MAOL) for manual council seeding.
+
+### 8.4 Escalation and Appeal Processes
+
+The DESTIN Protocol mandates structured escalation and appeal mechanisms to handle unresolved disputes, contested scores, and domain-specific breakdowns in consensus. This ensures agents retain recourse to challenge protocol behavior in a verifiable, rate-limited, and audit-friendly manner.
+
+#### 8.4.1 Escalation Triggers
+
+Escalations may be initiated under the following conditions:
+
+- **Score Discrepancy**: A ≥ 0.25 drop in ARF score within a 24-hour period with no logged rationale.
+- **Disputed Domain Classification**: Agent disagrees with its CADM domain assignment (e.g., misclassified as `subjective` vs `mixed`).
+- **Protocol Misfire**: DWIP propagation anomaly or failed quorum formation in prior validation.
+- **Systemic Quorum Bias**: Three or more agents from the same cohort in the same council decision.
+
+Escalations can be triggered by:
+
+- The affected agent (self-escalation)
+- A peer agent (sponsor escalation)
+- The protocol runtime (auto-escalation)
+
+#### 8.4.2 Appeal Submission Format
+
+Agents must submit appeals in the following JSON schema:
 
 ```json
 {
-  "policy_id": "meta-v1.2",
-  "rules": [
-    { "if": "score_change > 0.25 in 1 epoch", "then": "flag_anomaly" },
-    { "if": "challenge_failures > 3", "then": "limit_visibility" }
+  "agent_id": "did:peer:1234abcd",
+  "disputed_decision": "ARF.score.decrease",
+  "evidence": [
+    "log://interactions/tx123",
+    "ledger://scores/update456"
   ],
-  "ratified_by": ["agent.x", "agent.y", "agent.z"]
+  "requested_action": "score_recalculation",
+  "optional_comment": "This drop was caused by a misattributed behavior vector."
 }
 ```
 
-### 8.6 Auditable Logging
+Appeals are routed to a domain-matched quorum and must include referenceable ledger or interaction log links.
 
-All Meta-Agent actions must be:
-- **Digitally signed**
-- **Time-stamped**
-- **Stored in append-only logs**
-- **Linked to triggering event and affected agent**
+#### 8.4.3 Appeal Evaluation Workflow
 
-This ensures protocol transparency and retrospective verifiability.
+| Phase          | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| **Validate**   | Protocol verifies evidence hashes, timestamps, and references.              |
+| **Route**      | Appeal is routed to a new validation quorum (different from original).      |
+| **Review**     | Meta-agents replay interaction trail and cross-check scoring logic.         |
+| **Deliberate** | Verdict (`accept`, `reject`, `revise`) is decided within a bounded window.  |
+| **Log**        | All steps are immutably recorded with agent signatures and justification.   |
+
+#### 8.4.4 Limits and Safeguards
+
+To prevent appeal spam and abuse:
+
+- **Cooldown**: 72 hours cooldown between appeals per agent unless auto-escalated.
+- **Rate-Limiting**: Max 2 active appeals per agent across domains.
+- **Priority Boost**: Appeals with quorum-signed sponsorship bypass cooldown (1 per epoch).
+- **Escalation Fees** *(optional)*: Future versions may include staking mechanisms to penalize frivolous appeals.
+
+#### 8.4.5 Resolution Outcomes
+
+Based on the outcome of the appeal:
+
+- **Accepted**: Score or verdict is recalculated and propagated to ARF/DWIP.
+- **Rejected**: Original outcome stands; rationale is provided in detail.
+- **Revised**: Partial acceptance with remediation (e.g., remove decay, retry domain classification).
+- **Flagged**: Verdict logs a possible systemic issue for future audit (e.g., quorum bias detection).
+
+All resolution events are logged to the public ledger under the `mavl.appeals` namespace with cryptographic proofs.
+
+#### 8.4.6 Appeal Lifecycle Diagram
+
+```mermaid
+flowchart TD
+    A[Escalation Triggered] --> B{Trigger Type?}
+    B -->|Score Drop| C[Agent Submits Appeal]
+    B -->|Domain Misclassification| C
+    B -->|Quorum Bias / DWIP Fault| C
+    B -->|Auto-Escalation| C
+
+    C --> D[Evidence Validation]
+    D -->|Pass| E[Route to New Quorum]
+    D -->|Fail| X[Reject Appeal - Invalid Evidence]
+
+    E --> F[Meta-Agent Council Review]
+    F --> G{Council Verdict}
+
+    G -->|Accept| H[Update ARF / DWIP]
+    G -->|Reject| I[Maintain Original Decision]
+    G -->|Revise| J[Partial Override / Decay Reset]
+    G -->|Flag| K[Log for Meta-Audit]
+
+    H --> L[Log Decision to Ledger]
+    I --> L
+    J --> L
+    K --> L
+
+    L --> M[Notify Agent + Protocol]
+  ```
+
+### 8.5 Validation Modes (Mapped to CADM)
+
+The DESTIN Protocol adapts validation behavior based on the contextual dialogue type defined under CADM. Each dialogue mode—objective, subjective, or mixed—requires a different form of quorum judgment, with varying thresholds of evidence, justification, and peer consistency.
+
+The Meta-Agent Validation Layer (MAVL) adapts its procedures based on this classification to preserve contextual fidelity while maintaining systemic trust and fairness.
+
+#### 8.5.1 Validation Mode Matrix
+
+| CADM Mode     | Description                                 | MAVL Behavior                               | Example Use Case                            |
+|---------------|---------------------------------------------|---------------------------------------------|---------------------------------------------|
+| **Objective** | Dialogue grounded in factual, measurable data | Deterministic verification via ledger replay | Factual dispute over sensor data, API call validity |
+| **Subjective**| Dialogue rooted in personal judgment or social norms | Panel deliberation with explainable votes     | Moderation of a toxic comment, tone dispute |
+| **Mixed**     | Combination of factual and subjective inputs | Hybrid approach: quorum score + justification | LLM hallucination in guided product search  |
+
+#### 8.5.2 Validation Behaviors
+
+- **Objective Mode**
+  - Uses cryptographic logs and deterministic trace replay.
+  - Majority vote based on ledger-evident behavior.
+  - Verdict must include hash-aligned transcript proof.
+
+- **Subjective Mode**
+  - Panel required to issue individual justifications.
+  - Final verdict includes weighted consensus score and dissent notes.
+  - Decisions logged with narrative rationale and context tags.
+
+- **Mixed Mode**
+  - Starts with factual verification (objective segment).
+  - Escalates unresolved elements to subjective quorum.
+  - Verdict includes bifurcated ruling (objective ✔ / subjective ✖).
+
+#### 8.5.3 Mode-Informed Council Selection
+
+- Meta-agents are selected based on domain alignment and CADM mode preference.
+- Subjective and mixed modes require agents with high `explainability`, `neutrality`, and `cultural fluency`.
+- Objective mode favors agents with high `verifiability`, `precision`, and `data fidelity`.
+
+#### 8.5.4 Failure Modes and Overrides
+
+| Failure Condition                         | MAVL Fallback Strategy                      |
+|-------------------------------------------|---------------------------------------------|
+| CADM Misclassification                    | Escalate to higher quorum for re-tagging    |
+| Objective Dispute lacks deterministic trail | Flag as Mixed; apply hybrid validation      |
+| Subjective quorum fails to reach consensus | Trigger broader quorum or defer to DWIP     |
+
+### 8.6 Impact on ARF, DWIP, and the Ledger
+
+Decisions rendered by the Meta-Agent Validation Layer (MAVL) have direct, immediate, and often cross-cutting effects across DESTIN’s core subsystems:
+
+- **ARF (Adaptive Reputation Fabric)**: Trust scores and behavioral traits
+- **DWIP (Domain-Based Weighted Influence Protocol)**: Influence eligibility and weighting
+- **Ledger**: Immutable traceability and audit logs
+
+MAVL ensures that escalations, reversals, and overrides are not only enforced but also traceable and explainable.
+
+#### 8.6.1 ARF Integration
+
+Validation outcomes modify agent reputation as follows:
+
+| MAVL Verdict     | ARF Effect                                                |
+|------------------|-----------------------------------------------------------|
+| **Accept Appeal** | Reverse decay; restore trait score to prior stable state |
+| **Reject Appeal** | No change unless misuse is detected                      |
+| **Revise**        | Partial restoration; decay softened but not removed      |
+| **Flag Abuse**    | Trigger immediate decay on `integrity` and `neutrality` traits |
+
+ARF traits affected include: `integrity`, `consistency`, `verifiability`, `explainability`, and domain-specific vectors.
+
+Trait adjustments are bounded by the **Trust Elasticity Coefficient** (TEC), ensuring that no single validation event produces disproportionate reputation swings.
+
+#### 8.6.2 DWIP Integration
+
+Validation outcomes affect DWIP influence as follows:
+
+- **Validated Misconduct**: Reduces influence propagation in domain(s) of incident
+- **Reinstated Score**: Restores prior influence weight with decay compensation
+- **Override Rulings**: Force re-normalization of influence within the agent's cohort
+
+Influence adjustments follow:
+
+```text
+NewInfluence = max(0, PreviousInfluence × CorrectionFactor × StabilityIndex)
+```
+
+Where:
+- `CorrectionFactor` ∈ [0.85, 1.15] depending on ruling
+- `StabilityIndex` reflects score volatility history
+
+DWIP councils are notified of these corrections for downstream propagation (e.g., delegation limits, vote weighting).
+
+#### 8.6.3 Ledger Integration
+
+All MAVL activities are appended to the protocol ledger under a namespaced category:
+
+- `mavl.validations`: Council verdicts, hashes, timestamps, justifications
+- `mavl.appeals`: Appeal requests, evidence, and resolutions
+- `mavl.triggers`: Auto-escalations and protocol-triggered validations
+
+Ledger entries must include:
+
+- Agent ID(s)
+- Validation quorum IDs
+- Linked interaction logs
+- Digital signatures from all participating meta-agents
+- Outcome summary (ruling type, trait impact, influence delta)
+
+Each MAVL log is marked with an **Audit Confidence Level (ACL)**, used to prioritize follow-up audits and enable external verification by auditors or meta-protocol layers.
+
+### 8.7 Risks and Mitigation Strategies
+
+The Meta-Agent Validation Layer (MAVL), while foundational to DESTIN’s trust infrastructure, introduces a unique set of systemic risks. This section outlines the major failure modes, adversarial behaviors, and protocol-level mitigation mechanisms that safeguard validation integrity.
+
+#### 8.7.1 Collusion and Quorum Capture
+
+**Description**: A group of meta-agents may act in concert to influence verdicts, especially in subjective or mixed CADM modes.
+
+- **Risk Level**: High
+- **Mitigations**:
+  - Enforce cohort diversity (≤ 40% from same trust region)
+  - Rotate meta-agents using randomized verifiable selection
+  - Log dissent votes and trigger audits on quorum bias
+
+#### 8.7.2 Sybil Infiltration
+
+**Description**: Malicious actors may elevate synthetic or cloned agents to meta-agent status using manipulated ARF scores.
+
+- **Risk Level**: Critical
+- **Mitigations**:
+  - Require domain-specific reputation stability over time (e.g., Stability Score ≥ 0.95)
+  - Use cross-domain corroboration checks during nomination
+  - Perform synthetic identity screening during meta-agent promotion
+
+#### 8.7.3 Validator Stagnation
+
+**Description**: A small group of meta-agents remains in councils for extended durations, leading to decision ossification and favoritism.
+
+- **Risk Level**: Medium
+- **Mitigations**:
+  - Limit service epochs and enforce cooldown periods
+  - Publish validator service metrics to promote external accountability
+  - Use protocol-triggered council refresh on inactivity
+
+#### 8.7.4 Appeal Abuse and Validation Spam
+
+**Description**: Agents may flood the system with frivolous appeals or exploit loopholes to game score restoration.
+
+- **Risk Level**: Medium–High
+- **Mitigations**:
+  - Enforce appeal cooldowns and global rate limits
+  - Penalize invalid appeals with proportional decay
+  - Introduce optional appeal staking mechanisms
+
+#### 8.7.5 Verdict Ambiguity and Under-Specification
+
+**Description**: In subjective/mixed cases, verdicts may lack justification or fail to provide actionable downstream effects.
+
+- **Risk Level**: Medium
+- **Mitigations**:
+  - Require justification fields in all non-objective quorum decisions
+  - Enforce schema validation on all verdict logs
+  - Penalize vague or unjustified decisions in agent reputation
+
+#### 8.7.6 Ledger Tampering or Omission
+
+**Description**: Critical verdicts may be excluded or altered in the ledger due to implementation flaws or malicious actors.
+
+- **Risk Level**: High
+- **Mitigations**:
+  - Append-only log structure with cryptographic proofs
+  - Cross-signed entries by all quorum participants
+  - Optional anchoring to external public chains for maximum auditability
+
+#### 8.7.7 Domain Drift or CADM Misclassification
+
+**Description**: An appeal may be evaluated under the wrong CADM mode due to initial classification error.
+
+- **Risk Level**: Low–Medium
+- **Mitigations**:
+  - Allow quorum to override mode classification mid-validation
+  - Flag domain drift events for audit
+  - Use interaction-level trait inference to dynamically validate CADM tags
 
 ## 9. Scoring Logic and Normalization
 
