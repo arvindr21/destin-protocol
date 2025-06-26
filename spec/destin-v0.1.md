@@ -25,8 +25,7 @@ In short: DESTIN is the missing trust layer for the AI-driven world, combining m
 [12. Ledger Architecture and Logging Mechanism](#12-ledger-architecture-and-logging-mechanism)<br>
 [13. Risks and Mitigation Strategies](#13-risks-and-mitigation-strategies)<br>
 [14. Glossary of Terms](#14-glossary-of-terms)<br>
-[15. Contributing](#15-contributing)<br>
-[16. Appendix](#16-appendix)<br>
+[15. Appendix](#15-appendix)<br>
 
 ### The Problem: When AI Agents Run the World
 
@@ -1481,14 +1480,14 @@ To prevent validator stagnation and mitigate influence centralization:
 | **Reelection Waiting Period**        | 2 epochs post-expiry before re-nomination      |
 
 - **Stochastic Reselection**: When multiple candidates are equally qualified, random tie-breakers are applied using a verifiable entropy source (e.g., timestamp-seeded VRF).
-- **Agent Ledger Tags**: Each agent’s election history is logged under `meta_agent.lifecycle` with timestamps, role types, and vote records.
+- **Agent Ledger Tags**: Each agent's election history is logged under `meta_agent.lifecycle` with timestamps, role types, and vote records.
 
 #### 8.3.4 Rotation Failure Modes
 
 If a domain lacks sufficient eligible agents:
 
 - **Fallback Pool**: Pull from adjacent domains with overlapping ARF vectors.
-- **Synthetic Injection**: Instantiate temporary meta-agents from the protocol’s synthetic validation pool (if enabled).
+- **Synthetic Injection**: Instantiate temporary meta-agents from the protocol's synthetic validation pool (if enabled).
 - **Escalation Path**: Flag condition to the Meta-Agent Oversight Layer (MAOL) for manual council seeding.
 
 ### 8.4 Escalation and Appeal Processes
@@ -1636,7 +1635,7 @@ The Meta-Agent Validation Layer (MAVL) adapts its procedures based on this class
 
 ### 8.6 Impact on ARF, DWIP, and the Ledger
 
-Decisions rendered by the Meta-Agent Validation Layer (MAVL) have direct, immediate, and often cross-cutting effects across DESTIN’s core subsystems:
+Decisions rendered by the Meta-Agent Validation Layer (MAVL) have direct, immediate, and often cross-cutting effects across DESTIN's core subsystems:
 
 - **ARF (Adaptive Reputation Fabric)**: Trust scores and behavioral traits
 - **DWIP (Domain-Based Weighted Influence Protocol)**: Influence eligibility and weighting
@@ -1699,7 +1698,7 @@ Each MAVL log is marked with an **Audit Confidence Level (ACL)**, used to priori
 
 ### 8.7 Risks and Mitigation Strategies
 
-The Meta-Agent Validation Layer (MAVL), while foundational to DESTIN’s trust infrastructure, introduces a unique set of systemic risks. This section outlines the major failure modes, adversarial behaviors, and protocol-level mitigation mechanisms that safeguard validation integrity.
+The Meta-Agent Validation Layer (MAVL), while foundational to DESTIN's trust infrastructure, introduces a unique set of systemic risks. This section outlines the major failure modes, adversarial behaviors, and protocol-level mitigation mechanisms that safeguard validation integrity.
 
 #### 8.7.1 Collusion and Quorum Capture
 
@@ -1777,56 +1776,138 @@ This section defines how agent reputation is calculated, updated, decayed, and n
 
 ### 9.1 Scoring Dimensions
 
-Agents are scored across **multi-trait dimensions** defined by the ARF system (Section 4). These include:
-- **Quantitative Traits:** e.g., Accuracy, Clarity, Responsiveness
-- **Qualitative Traits:** e.g., Empathy, Alignment, Civility
-- **Behavioral Traits:** e.g., Collaboration, Engagement
+Agents are evaluated across **multi-dimensional trait vectors** defined by the **Adaptive Reputation Fabric (ARF)**. Each trait represents a measurable behavior or attribute relevant to agent performance in a specific domain.
 
-Scores are always maintained **per domain**, producing a set of \[trait → score\] mappings for each agent-domain pair.
+Traits are categorized as:
+
+- **Quantitative Traits**  
+  Measurable metrics derived from structured interactions.  
+  _Examples_: `accuracy`, `clarity`, `responsiveness`
+
+- **Qualitative Traits**  
+  Subjective or context-dependent traits, often inferred from user feedback or semantic analysis.  
+  _Examples_: `empathy`, `alignment`, `civility`
+
+- **Behavioral Traits**  
+  Reflect interaction patterns and collaborative intent over time.  
+  _Examples_: `collaboration`, `engagement`, `persistence`
+
+Each agent maintains a **per-domain trait score map**, structured as:
+
+```json
+{
+  "domain": "law.arbitration",
+  "traits": {
+    "accuracy": 0.89,
+    "civility": 0.93,
+    "engagement": 0.76
+  }
+}
+```
+
+Scoring dimensions are **domain-scoped** and **mode-aware**, meaning they may vary or be weighted differently based on the active **CADM dialogue mode**. For example, `empathy` may be weighted heavily in `subjective` advisory tasks but ignored in `objective` computation-based domains.
+
 
 ### 9.2 Score Update Logic
 
-Each interaction can trigger an update to the agent's ARF scores. The update is weighted based on:
+Agent scores within the ARF trait vector are dynamically updated based on **interactions**, such as message exchanges, task completions, arbitration decisions, or peer ratings. Each update contributes to the evolution of the agent's domain-specific reputation profile.
 
-- **Feedback quality and confidence**
-- **Number of raters (sample size)**
-- **The rater's own reputation (discounting low-trust raters)**
+#### Update Triggers
 
-Update formula (abstracted):
+A score update may be triggered by:
+
+- **Direct feedback** (explicit ratings or evaluations)
+- **Indirect feedback** (derived from observed behavior or dialogue outcomes)
+- **Validation outcomes** (via meta-agent reviews or arbitration)
+
+#### Weighted Update Function
+
+Updates are aggregated using a **trust-weighted, decayed rolling average**:
 
 ```math
 score_{new} = \alpha \times score_{old} + (1 - \alpha) \times feedback_score
 ```
 
-Where \( \alpha \) (decay inertia) is adjusted dynamically based on the feedback source quality.
+Where:
+
+- \( score_{old} \) is the previous trait score
+- \( feedback_score \) is the normalized input from a recent interaction
+- \( \alpha \in [0, 1] \) is the **inertia coefficient**, controlling how resistant the score is to change
+
+#### Dynamic Weight Adjustment
+
+The coefficient \( \alpha \) is **not static**; it is adjusted based on:
+
+| Factor                         | Impact on \( \alpha \) |
+|-------------------------------|-------------------------|
+| **Feedback quality**          | High-quality feedback → lower \( \alpha \) (score adapts faster) |
+| **Sample size (n raters)**    | Larger rater set → lower \( \alpha \) |
+| **Rater reputation (ARF)**    | Low-rep rater → higher \( \alpha \) (reduced influence) |
+
+This mechanism ensures that updates are **proportional to signal strength** and discourages manipulation from untrusted or sparse sources.
+
+#### Example
+
+A feedback score of `0.75` is received for the `clarity` trait from a trusted rater cohort. Given a prior score of `0.80` and an adjusted \( \alpha = 0.6 \):
+
+```math
+score_{new} = 0.6 × 0.80 + 0.4 × 0.75 = 0.48 + 0.30 = 0.78
+```
+
+The system retains **stability** while remaining responsive to credible feedback.
+
 
 ### 9.3 Decay Functions
 
-To reduce stale influence, DESTIN applies **trait-specific decay** when agents are inactive or stop participating in a domain:
+To preserve the **temporal relevance of agent behavior**, DESTIN applies **trait-specific decay functions** when an agent becomes inactive or reduces participation within a given domain. This prevents long-dormant agents from exerting disproportionate influence based on outdated reputations.
 
-| Trait Type     | Decay Type         | Purpose                                 |
-|--------------- |------------------- |-----------------------------------------|
-| Quantitative   | Exponential decay  | Prevents overreliance on past accuracy  |
-| Qualitative    | Linear decay       | Models trust erosion over time          |
-| Session-based  | Instant reset/freeze | Penalizes abandonment or drop-off      |
+#### Decay Models by Trait Type
 
-Default decay curves are domain-dependent but follow the principle:
+| Trait Type      | Decay Model            | Purpose                                         |
+|-----------------|------------------------|-------------------------------------------------|
+| **Quantitative** | Exponential decay       | Diminishes reliance on past precision or performance metrics |
+| **Qualitative**  | Linear decay            | Models gradual erosion of subjective trust traits (e.g., empathy) |
+| **Session-based**| Instant reset or freeze | Penalizes abrupt drop-off in participation (e.g., abandoned arbitration sessions) |
+
+#### General Decay Formula
+
+Default decay curves are **domain-specific** and adjustable by protocol designers. The canonical form for exponential decay is:
 
 ```math
 score_t = score_0 \times e^{-\lambda t}
 ```
 
-Where \( \lambda \) is the decay rate and \( t \) is time since last update.
+Where:
+
+- \( score_0 \) is the last recorded score
+- \( t \) is the elapsed time since the last interaction affecting the trait
+- \( \lambda \) is the **decay rate coefficient**, tuned per domain and trait type
+
+#### Notes
+
+- Traits with high **volatility** (e.g., `responsiveness`, `engagement`) should decay faster.
+- Traits that evolve slowly (e.g., `integrity`, `alignment`) may use slower decay or **decay only under inactivity**.
+- Protocol extensions may implement **custom decay policies** per CADM mode or based on agent roles.
+
 
 ### 9.4 Domain-Level Overrides
 
-Every domain can specify:
+To support diverse behavioral expectations across domains, DESTIN allows each domain to define **custom overrides** that tailor how agent scores are computed, decayed, and applied within that domain's context.
 
-- **Custom weights** for each ARF trait
-- **Custom decay profiles**
-- **Active/inactive trait toggles**
+#### Override Capabilities
 
-This is defined in a **Domain Profile Schema**, such as:
+A domain may register a **Domain Profile Schema** that includes:
+
+- **Trait Weighting**  
+  Assigns relative importance to each ARF trait when computing composite influence or eligibility scores.
+
+- **Custom Decay Profiles**  
+  Defines decay functions per trait to reflect temporal sensitivity or persistence of trust within the domain.
+
+- **Trait Activation Flags**  
+  Enables or disables certain traits entirely if they are irrelevant to the domain's operations.
+
+#### Sample Domain Profile Schema
 
 ```json
 {
@@ -1839,41 +1920,118 @@ This is defined in a **Domain Profile Schema**, such as:
   "decay": {
     "alignment": "linear-0.003",
     "collaboration": "exp-0.008"
-  }
+  },
+  "active_traits": ["alignment", "collaboration", "clarity"]
 }
 ```
 
-This ensures that **trait relevance is domain-contextual** and adaptable to changing norms.
+#### Rationale
+
+These overrides ensure that:
+
+- **Trait relevance is domain-contextual** rather than globally static
+- **Norms and priorities can evolve** without requiring protocol-wide score recalibration
+- **CADM mode alignment** is preserved by tailoring scoring behavior to interaction type and role expectations
+
 
 ### 9.5 Cohort-Based Normalization
 
-Raw scores are normalized across the **current domain cohort** to ensure that:
+To ensure **comparability of scores** across diverse agents operating within the same context, DESTIN applies **cohort-based normalization**. This prevents inflated or deflated scores from skewing influence, eligibility, or selection outcomes within a domain.
 
-- Influence is relative, not absolute
-- New agents can compete fairly
-- High performers are periodically recalibrated
+#### Definition
 
-Normalization techniques include:
+A **cohort** is a set of agents grouped by shared domain context, operational scope, and lifecycle stage. Examples include:
 
-- **Z-score normalization**
-- **Percentile scaling**
-- **Softmax compression**
+- Agents operating in `law.arbitration` within `jurisdiction.us.central`
+- Agents contributing to `science.peer_review` for `journal.x`
 
-Normalized scores always fall in the range `[0.0 -- 1.0]`.
+Normalization ensures scores are **interpreted relative to cohort peers**, not in isolation.
+
+#### Normalization Methodology
+
+DESTIN supports multiple normalization strategies per cohort, including:
+
+| Method             | Description                                                           |
+|--------------------|-----------------------------------------------------------------------|
+| **Z-Score**         | Standardizes scores by mean and standard deviation                   |
+| **Min-Max Scaling** | Transforms scores to a bounded [0,1] range within the cohort         |
+| **Quantile Binning**| Ranks agents into percentiles or deciles                            |
+
+Each trait score is normalized separately, and domain designers can configure preferred methods via the **Domain Profile Schema**.
+
+#### Sample Trait Normalization (Z-Score)
+
+For trait `clarity` in a cohort of 100 agents:
+
+```math
+z = \frac{score_i - \mu}{\sigma}
+```
+
+Where:
+
+- \( score_i \) is the agent's raw score
+- \( \mu \) is the cohort mean
+- \( \sigma \) is the standard deviation of that trait in the cohort
+
+#### Benefits
+
+- **Fair Comparisons**: Prevents high-performing domains from overshadowing others
+- **Anti-Gaming**: Discourages artificial inflation of scores without peer-relative performance
+- **Dynamic Scoping**: Cohorts may evolve with domain splits, merges, or governance updates
+
+#### Design Note
+
+Normalization is applied **after decay** and **before aggregation or influence calculation**, ensuring that stale scores do not distort peer-relative assessments.
 
 ### 9.6 Influence Score Output
 
-Final DWIP influence is derived using:
+The **Influence Score** is the final, normalized, and aggregated output used by downstream components in the DESTIN ecosystem to assess an agent's weight in decision-making, arbitration, delegation, or visibility.
 
-```math
-influence_score = \sum (normalized_trait_i \times domain_weight_i)
+It reflects:
+
+- **Decay-adjusted, cohort-normalized scores**
+- **Domain-specific trait weights and thresholds**
+- **CADM-mode modifiers**, if applicable
+
+#### Output Format
+
+Influence scores are structured and timestamped per agent-domain pair:
+
+```json
+{
+  "agent_id": "did:peer:xyz123",
+  "domain": "governance.local",
+  "influence_score": 0.782,
+  "last_updated": "2025-06-23T12:00:00Z",
+  "confidence": 0.92,
+  "stability": 0.87
+}
 ```
 
-This composite is the agent's **active influence** for that dialogue context. It determines:
+#### Key Fields
 
-- Facilitator eligibility
-- Challenge thresholds
-- Weighting of voice in synthesis or resolution
+| Field            | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| `influence_score`| Final score used by DWIP or ARF modules                                     |
+| `confidence`     | Signal quality indicator (e.g., rater diversity, feedback consistency)      |
+| `stability`      | Temporal consistency (e.g., volatility over last N updates)                 |
+| `last_updated`   | Timestamp of last trait-level score change influencing output               |
+
+#### Application
+
+Influence scores are used in:
+
+- **DWIP weight assignment** for arbitration panels, validators, or task routing (see [Section 5](#5-domain-weighted-influence-protocol-dwip))
+- **Eligibility filtering** under ARF logic for delegation, selection, or participation (see [Section 4](#4-adaptive-reputation-fabric-arf))
+- **CADM resolution processes** where input needs to be weighted by expertise or alignment (see [Section 6](#6-context-aware-dialogue-modes-cadm))
+
+#### Design Note
+
+Implementations should:
+
+- Expose influence scores via **auditable endpoints or ledgers** (see [Section 11](#11-ledger-architecture-and-logging-mechanism))
+- Allow clients to **filter or weight scores** based on confidence or stability tolerances
+- Apply **differential privacy or obfuscation** mechanisms in sensitive domains (e.g., legal, health)
 
 ## 10. Domain Classification and Dispute Resolution
 
@@ -2239,16 +2397,7 @@ This glossary defines all key acronyms, components, and technologies referenced 
 | **Collusion**          | Coordinated behavior between two or more agents to unfairly manipulate reputation, influence, or decision outcomes, often at the expense of protocol fairness. |
 | **Reputation Gaming**  | Strategic manipulation of the reputation system by agents (individually or in groups) to artificially inflate scores, evade penalties, or gain undue influence. |
 
-## 15. Contributing
-
-Contributions, suggestions, and feedback are welcome! To propose changes or improvements:
-- Fork the repository and create a pull request
-- Open an issue for discussion
-- For major changes, please start a DESTIN Improvement Proposal (DIP) as described in Section 11
-
-For questions or to get involved, please contact the maintainers or open a discussion on GitHub.
-
-## 16. Appendix
+## 15. Appendix
 
 
 ### Domain Tag Registry
