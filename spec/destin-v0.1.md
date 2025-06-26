@@ -21,8 +21,8 @@ In short: DESTIN is the missing trust layer for the AI-driven world, combining m
 [8. Meta-Agent Validation Layer](#8-meta-agent-validation-layer)<br>
 [9. Scoring Logic and Normalization](#9-scoring-logic-and-normalization)<br>
 [10. Domain Classification and Dispute Resolution](#10-domain-classification-and-dispute-resolution)<br>
-[11. Protocol Governance](#11-protocol-governance)<br>
-[12. Ledger Architecture and Logging Mechanism](#12-ledger-architecture-and-logging-mechanism)<br>
+[11. Ledger Architecture and Logging Mechanism](#11-ledger-architecture-and-logging-mechanism)<br>
+[12. Protocol Governance](#12-protocol-governance)<br>
 [13. Risks and Mitigation Strategies](#13-risks-and-mitigation-strategies)<br>
 [14. Glossary of Terms](#14-glossary-of-terms)<br>
 [15. Appendix](#15-appendix)<br>
@@ -2037,167 +2037,122 @@ Implementations should:
 
 DESTIN relies on domain tagging to determine how agents interact, how their reputation is evaluated, and which dialogue mode (CADM) governs the exchange. This section outlines the formal process for classifying domains, resolving disagreements over classification, and adapting to evolving epistemic boundaries.
 
-### 10.1 Domain Tagging Registry
+### 10.1 Domain Tagging and Classification
 
-Each interaction in DESTIN occurs within a **named domain**. Domains are maintained in a signed, version-controlled registry that defines:
+Agents and interactions are classified under **domain tags**, such as:
 
-- Domain identifier (e.g., science.research)
-- Default dialogue mode (Objective / Subjective / Ambiguous)
-- Trait weight vector (for ARF)
-- Decay functions
-- Classification confidence score
+- `law.arbitration`
+- `science.peer_review`
+- `governance.local`
 
-**Example entry:**
+Tags enable scoped scoring, aggregation, and participation rules.
 
-```yaml
-- domain: governance.policy
-  type: ambiguous
-  default_weights:
-    alignment: 0.4
-    collaboration: 0.4
-    empathy: 0.2
-  decay_model: "linear-0.002"
-  confidence: 0.92
-```
+Classification may occur via:
 
-This registry is referenced by DWIP, CADM, ARF, and the Meta-Agent Validation Layer.
+- **Self-declaration** during registration or invocation
+- **Inference** by domain validators or meta-agents
+- **Consensus tagging** through multi-agent agreement
+
+Each domain tag corresponds to a **Domain Profile Schema** (see [Section 9.4](#94-domain-level-overrides)) that governs scoring and influence logic.
 
 ### 10.2 Agent Disagreement Logic
 
-Agents may contest the domain classification of a topic if they believe it is misclassified (e.g., ethics.ai marked as Objective instead of Ambiguous).
+Disputes arise when agents:
 
-**Trigger Conditions:**
+- Disagree on **domain membership or tag applicability**
+- Challenge another agent's **score, eligibility, or role**
+- Raise concerns over **trait weightings or decay bias**
 
-- Minimum disagreement threshold (e.g., 20% of agents in session)
-- Supporting rationale from challengers
-- Detected classification drift from historical precedent
+DESTIN enables resolution via a **multi-phase mechanism**:
 
-**Outcomes:**
+1. **Local Resolution Attempt**  
+   Agents may initiate a **dialogue in the active CADM mode** to self-resolve the conflict.
 
-- Enter temporary **Meta-Debate**
-- Escalate to influence-weighted vote
+2. **Peer Voting (Confidence Voting)**  
+   A relevant cohort may vote on which classification or outcome to accept, using normalized influence scores (DWIP-weighted).
+
+3. **Escalation to Validators**  
+   If confidence voting fails or bias is suspected, a neutral arbitration panel is convened (see [Section 8.4](#84-escalation-and-appeal-processes)).
+
+4. **Reclassification or Override**  
+   Upon conclusion, the domain tag or score may be reissued with an **audit trail** and **traceable override reason**.
 
 ### 10.3 Confidence Voting System
 
-When classification is challenged, DESTIN uses **confidence-weighted voting**:
+Confidence voting enables **domain-scoped majority resolution**, where agent influence is used as a **weighted trust signal** rather than equal votes.
 
-| Phase     | Action                                                      |
-|-----------|-------------------------------------------------------------|
-| Proposal  | One or more agents submit alternate classification          |
-| Voting    | All participating agents vote on classification             |
-| Weighting | Votes weighted by normalized DWIP influence scores          |
-| Outcome   | Highest-weighted type becomes active for session            |
+Each vote is weighted by:
 
-If outcome confidence > threshold (e.g., 80%), registry may suggest reclassification.
+```math
+V_i = influence_i × stability_i × confidence_i
+```
+
+Where:
+
+`influence_i` is the voter's normalized DWIP score in that domain
+`stability_i` reflects their scoring volatility over time
+`confidence_i` reflects the rater diversity or evidence backing
+
+The option with the highest weighted sum is adopted, unless escalation thresholds are met.
 
 ### 10.4 Dynamic Classification Resolution
 
-Domains may be **reclassified** based on:
+DESTIN supports **reclassification and dispute overrides** as part of its dynamic governance model.
 
-- Accumulated confidence shifts
-- Dispute frequency in dialogue logs
-- Recommendation from Meta-Agent audits
+When a dispute results in reclassification or trait score adjustment, the following steps are enforced:
 
-Each domain maintains:
+- **Score Reissue**  
+  Updated scores or domain tags are written to the agent profile, versioned, and timestamped.
 
-- **Classification history**
-- **Volatility score** (frequency of recent classification shifts)
-- **Pending reclassification proposals**
+- **Dispute Ledger Entry**  
+  An auditable record is created in the ledger (see [Section 11](#11-ledger-architecture-and-logging-mechanism)) that includes:
+  - Agent IDs involved
+  - Original vs. updated classification
+  - Resolution pathway used
+  - Voting breakdown and thresholds
+  - Override justification (if applicable)
 
-Reclassification follows the **DESTIN Improvement Proposal (DIP)** process (Section 11).
+- **Cohort Notification (Optional)**  
+  In high-stakes domains, a subset of the cohort may be notified of the override for transparency.
+
+This mechanism ensures that domain misalignment, manipulation attempts, or scoring abuse is not only **detectable**, but also **auditable and reversible** within protocol bounds.
 
 ### 10.5 Fallback Logic
 
-| Condition                   | Fallback Behavior                          |
-|-----------------------------|--------------------------------------------|
-| No consensus in voting      | Default to registered classification       |
-| Classification not in registry | Default to ambiguous mode                |
-| Meta-Agent override active  | Apply override and log rationale           |
-| Volatile domain flagged     | Mark for human review or dynamic tagging   |
+If confidence voting fails to reach quorum, or if a resolution loop exceeds a predefined time or retry limit, DESTIN invokes **fallback mechanisms** to ensure forward progress.
 
-## 11. Protocol Governance
+#### 10.5.1 Fallback Triggers
 
-DESTIN is designed to evolve openly, securely, and collaboratively. Protocol governance defines how the specification is versioned, amended, and maintained - ensuring transparency, community alignment, and resistance to centralization.
+- Insufficient voter participation
+- Repeated tie conditions in weighted votes
+- Time expiration of resolution window
+- Detection of coordinated bias or invalid raters
 
-### 11.1 Governance Objectives
+#### 10.5.2 Resolution Options
 
-- Enable structured evolution of the protocol through formal proposals
-- Maintain a stable reference implementation and compatibility guarantees
-- Rotate validator roles to prevent power concentration
-- Balance technical merit, reputational weight, and domain diversity
+- **Randomized selection within eligible pool**  
+  A probabilistic selector chooses from eligible agents based on partial influence weighting.
 
-### 11.2 Specification Versioning
+- **Meta-agent arbitration**  
+  A higher-trust neutral meta-agent (see [Section 8](#8-meta-agent-validation-layer)) makes a binding call.
 
-DESTIN adopts **semantic versioning**:
+- **Escalation to external governance layer**  
+  For cross-domain or protocol-wide disputes, decisions are deferred to a higher governance tier (see [Section 12](#12-protocol-governance)).
 
-MAJOR.MINOR.PATCH
-- **MAJOR**: Incompatible changes (e.g., new identity model, scoring logic)
-- **MINOR**: Backward-compatible feature additions (e.g., new traits, modes)
-- **PATCH**: Bug fixes, clarifications, or non-functional updates
+Fallbacks are auditable and explicitly tagged as such in the **dispute ledger**, enabling downstream agents to treat fallback-derived decisions with **reduced or provisional trust**.
 
-Each version is linked to:
-- A git commit hash of the canonical spec
-- A test suite version tag
-- A release note summary signed by validator quorum
-
-### 11.3 DESTIN Improvement Proposals (DIPs)
-
-All protocol changes must go through the **DIP process**, modeled after Ethereum EIPs.
-
-| Phase            | Action                                         |
-|------------------|------------------------------------------------|
-| Draft            | Proposal written and submitted publicly         |
-| Community Review | Discussion and revision through open channels   |
-| Meta-Agent Review| Vetted for protocol safety, coherence, and scope|
-| Finalization     | Approved by ≥⅔ validator quorum                 |
-| Activation       | Linked to a target protocol version (e.g., v1.3)|
-
-DIPs are tracked in a public registry and may include optional reference implementations.
-
-### 11.4 Validator Council Rotation
-
-DESTIN maintains a rotating **Validator Council** responsible for:
-- Ratifying DIPs
-- Approving spec releases
-- Sanctioning protocol violations (via Meta-Agent recommendations)
-
-**Rotation Mechanics:**
-- Minimum council size: 5
-- Rotation frequency: every N epochs or based on quorum score decay
-- Diversity guardrails: no more than 50% from the same domain class
-- Ejection: triggered by inactivity, manipulation, or DIP violation
-
-Validators are selected based on:
-- Cross-domain ARF score average
-- Voting history consistency
-- Endorsements by existing validators
-
-### 11.5 Open Spec Ecosystem
-
-DESTIN governance encourages:
-
-- **Multiple compatible implementations**
-- **Version negotiation** during agent handshakes
-- **Forking rights** under permissive licenses (e.g., Apache 2.0 / CC-BY)
-
-Each implementation must:
-
-- Declare DESTIN-Version
-- Pass public test suites
-- Be auditable by third-party or Meta-Agent layer
-
-## 12. Ledger Architecture and Logging Mechanism
+## 11. Ledger Architecture and Logging Mechanism
 
 DESTIN requires a transparent, tamper-evident system for recording key events such as score updates, disputes, domain changes, and agent actions. This section outlines a **hybrid ledger architecture** combining verifiable logging with flexible pluggability, without enforcing blockchain dependency.
 
-### 12.1 Design Principles
+### 11.1 Design Principles
 
 - **Auditability:** Every reputation-altering or governance event must be traceable
 - **Verifiability:** Logs must be signed and tamper-resistant
 - **Scalability:** Routine operations should not incur heavy consensus overhead
 - **Pluggability:** Implementers may choose from various ledger backends
 
-### 12.2 Ledger Layers
+### 11.2 Ledger Layers
 
 DESTIN separates logging into two complementary layers:
 
@@ -2215,7 +2170,7 @@ Each log entry must include:
 - signed_payload
 - Optional parent_event for lineage
 
-### 12.3 Event Log Taxonomy
+### 11.3 Event Log Taxonomy
 
 DESTIN defines a strict schema for event types to enable machine-readability and dispute traceability.
 
@@ -2234,7 +2189,7 @@ Each event must link to:
 - The relevant domain context
 - A cryptographic signature from the authoring agent or validator
 
-### 12.4 Pluggable Backends
+### 11.4 Pluggable Backends
 
 DESTIN does **not mandate blockchain usage**, but allows for optional anchoring via:
 
@@ -2253,7 +2208,7 @@ ledger.verify(event_id)
 ledger.query(filter)
 ```
 
-### 12.5 Retention and Replay
+### 11.5 Retention and Replay
 
 - Events are immutable once committed
 - Logs can be **snapshotted and replayed** to:
@@ -2262,6 +2217,77 @@ ledger.query(filter)
   - Audit identity and scoring history
 
 To support agent migration and failover, logs may be exported in canonical format (e.g., JSON-LD with signature metadata).
+
+## 12. Protocol Governance
+
+DESTIN is designed to evolve openly, securely, and collaboratively. Protocol governance defines how the specification is versioned, amended, and maintained - ensuring transparency, community alignment, and resistance to centralization.
+
+### 12.1 Governance Objectives
+
+- Enable structured evolution of the protocol through formal proposals
+- Maintain a stable reference implementation and compatibility guarantees
+- Rotate validator roles to prevent power concentration
+- Balance technical merit, reputational weight, and domain diversity
+
+### 12.2 Specification Versioning
+
+DESTIN adopts **semantic versioning**:
+
+MAJOR.MINOR.PATCH
+- **MAJOR**: Incompatible changes (e.g., new identity model, scoring logic)
+- **MINOR**: Backward-compatible feature additions (e.g., new traits, modes)
+- **PATCH**: Bug fixes, clarifications, or non-functional updates
+
+Each version is linked to:
+- A git commit hash of the canonical spec
+- A test suite version tag
+- A release note summary signed by validator quorum
+
+### 12.3 DESTIN Improvement Proposals (DIPs)
+
+All protocol changes must go through the **DIP process**, modeled after Ethereum EIPs.
+
+| Phase            | Action                                         |
+|------------------|------------------------------------------------|
+| Draft            | Proposal written and submitted publicly         |
+| Community Review | Discussion and revision through open channels   |
+| Meta-Agent Review| Vetted for protocol safety, coherence, and scope|
+| Finalization     | Approved by ≥⅔ validator quorum                 |
+| Activation       | Linked to a target protocol version (e.g., v1.3)|
+
+DIPs are tracked in a public registry and may include optional reference implementations.
+
+### 12.4 Validator Council Rotation
+
+DESTIN maintains a rotating **Validator Council** responsible for:
+- Ratifying DIPs
+- Approving spec releases
+- Sanctioning protocol violations (via Meta-Agent recommendations)
+
+**Rotation Mechanics:**
+- Minimum council size: 5
+- Rotation frequency: every N epochs or based on quorum score decay
+- Diversity guardrails: no more than 50% from the same domain class
+- Ejection: triggered by inactivity, manipulation, or DIP violation
+
+Validators are selected based on:
+- Cross-domain ARF score average
+- Voting history consistency
+- Endorsements by existing validators
+
+### 12.5 Open Spec Ecosystem
+
+DESTIN governance encourages:
+
+- **Multiple compatible implementations**
+- **Version negotiation** during agent handshakes
+- **Forking rights** under permissive licenses (e.g., Apache 2.0 / CC-BY)
+
+Each implementation must:
+
+- Declare DESTIN-Version
+- Pass public test suites
+- Be auditable by third-party or Meta-Agent layer
 
 ## 13. Risks and Mitigation Strategies
 
