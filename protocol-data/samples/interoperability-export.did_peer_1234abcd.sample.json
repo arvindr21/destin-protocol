@@ -1,0 +1,28 @@
+{
+  "agent_id": "did:peer:1234abcd",
+  "domain": "law",
+  "timestamp": "2025-06-30T12:00:00Z",
+  "reputation_vector": {
+    "integrity": 0.91,
+    "explainability": 0.88
+  },
+  "signature": "0xdeadbeefcafebabe11223344556677889900aabbccddeeff0011223344556677889900aabbccddeeff0011223344556677889900aabbccddeeff",
+  "signature_algorithm": "secp256k1",
+  "public_key": "z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA",
+  "exporting_system": "destin-validator-v1",
+  "exporting_validator": "did:validator:0xABC",
+  "confidence_scores": {
+    "integrity": 0.95,
+    "explainability": 0.92
+  },
+  "stability_scores": {
+    "integrity": 0.98,
+    "explainability": 0.94
+  },
+  "last_updated": "2025-06-29T15:30:00Z",
+  "cohort_context": "law-2025-Q2",
+  "metadata": {
+    "protocol_version": "v0.1",
+    "export_reason": "interoperability"
+  }
+}

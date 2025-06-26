@@ -1,0 +1,32 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Run schema validation
+echo "🔍 Running schema validation..."
+npm run validate-samples
+if [ $? -ne 0 ]; then
+  echo "❌ Schema validation failed. Please fix the validation errors before committing."
+  exit 1
+fi
+
+echo "✅ Schema validation passed!"
+
+# Run markdown linting
+echo "📝 Checking markdown formatting..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ Markdown linting failed. Please fix the formatting issues before committing."
+  exit 1
+fi
+
+# Run code formatting check
+echo "🎨 Checking code formatting..."
+npm run format
+if [ $? -ne 0 ]; then
+  echo "❌ Code formatting failed. Please fix the formatting issues before committing."
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!" 

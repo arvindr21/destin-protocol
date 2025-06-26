@@ -1,0 +1,27 @@
+[
+  {
+    "timestamp": "2025-07-01T12:30:00Z",
+    "source": "peer_endorsement",
+    "trait": "integrity",
+    "delta": 0.02,
+    "domain": "law",
+    "cohort_id": "law-2025-Q3",
+    "validator_id": "did:validator:0xABC",
+    "interaction_id": "interaction-12345678",
+    "old_score": 0.89,
+    "new_score": 0.91,
+    "confidence": 0.95,
+    "justification": "Agent demonstrated exceptional integrity during legal arbitration"
+  },
+  {
+    "timestamp": "2025-07-02T09:00:00Z",
+    "source": "task_outcome",
+    "trait": "intent_alignment",
+    "delta": -0.01,
+    "domain": "governance",
+    "cohort_id": "gov-2025-Q3",
+    "old_score": 0.86,
+    "new_score": 0.85,
+    "confidence": 0.88
+  }
+]

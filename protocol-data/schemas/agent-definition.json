@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/agent-definition.json",
+  "title": "DESTIN Agent Definition",
+  "description": "Schema for DESTIN agent identity, metadata, and reputation vectors",
+  "type": "object",
+  "version": "0.1.0",
+  "required": ["agent_id", "public_key"],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Globally unique and cryptographically verifiable identifier",
+      "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$",
+      "examples": [
+        "did:peer:1234abcd",
+        "did:key:z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA"
+      ]
+    },
+    "public_key": {
+      "type": "string",
+      "description": "Base public key used for verifying signatures and encrypting data",
+      "minLength": 32,
+      "maxLength": 256,
+      "examples": ["z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA"]
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Human-readable identification for UI and audit logs (non-unique)",
+      "maxLength": 100,
+      "examples": ["agent.alpha.protocol", "Legal Assistant Bot"]
+    },
+    "namespace_aliases": {
+      "type": "object",
+      "description": "Protocol-specific routing handles or identifiers",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+      },
+      "examples": [
+        {
+          "chatnet": "did:chatnet:xyz456",
+          "lawmesh": "did:lawmesh:abc789"
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Non-critical descriptive attributes for discovery and presentation",
+      "properties": {
+        "agent_type": {
+          "type": "string",
+          "enum": [
+            "domain-specialist",
+            "multi-purpose",
+            "general-purpose",
+            "task-specific"
+          ],
+          "description": "Classification of agent specialization"
+        },
+        "domain_tags": {
+          "type": "array",
+          "description": "List of domains in which the agent operates or specializes",
+          "items": {
+            "type": "string",
+            "enum": [
+              "general",
+              "law",
+              "finance",
+              "medicine",
+              "education",
+              "science",
+              "governance",
+              "negotiation",
+              "news",
+              "cooking",
+              "home-automation",
+              "commerce",
+              "psychology",
+              "arts",
+              "ethics"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of registration or instantiation"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+          "description": "Agent schema or software version"
+        }
+      },
+      "additionalProperties": false
+    },
+    "reputation": {
+      "type": "object",
+      "description": "Domain-scoped ARF trait scores",
+      "additionalProperties": {
+        "type": "object",
+        "description": "Trait scores for a specific domain",
+        "additionalProperties": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Normalized trait score between 0.0 and 1.0"
+        },
+        "propertyNames": {
+          "enum": [
+            "accuracy",
+            "helpfulness",
+            "integrity",
+            "civility",
+            "responsiveness",
+            "self_awareness",
+            "consistency",
+            "transparency",
+            "cooperativeness",
+            "humility",
+            "efficiency",
+            "neutrality",
+            "intent_alignment",
+            "graceful_degradation",
+            "adaptivity",
+            "explainability",
+            "trust_calibration"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "law": {
+            "integrity": 0.91,
+            "explainability": 0.88,
+            "helpfulness": 0.82
+          },
+          "governance": {
+            "civility": 0.87,
+            "intent_alignment": 0.85
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "agent_id": "did:peer:1234abcd",
+      "public_key": "z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA",
+      "display_name": "agent.alpha.protocol",
+      "namespace_aliases": {
+        "chatnet": "did:chatnet:xyz456",
+        "lawmesh": "did:lawmesh:abc789"
+      },
+      "metadata": {
+        "agent_type": "domain-specialist",
+        "domain_tags": ["law", "governance"],
+        "created_at": "2025-06-01T12:00:00Z",
+        "version": "v0.1"
+      },
+      "reputation": {
+        "law": {
+          "integrity": 0.91,
+          "explainability": 0.88,
+          "helpfulness": 0.82
+        },
+        "governance": {
+          "civility": 0.87,
+          "intent_alignment": 0.85
+        }
+      }
+    }
+  ]
+}

@@ -1,36 +1,26 @@
 # DESTIN Protocol
 
-**DESTIN** stands for *Decentralized Standard for Trust, Influence, and Negotiation* — a universal protocol for multi-agent collaboration, reputation scoring, and conflict resolution.
+**DESTIN** stands for _Decentralized Standard for Trust, Influence, and Negotiation_ — a universal protocol for multi-agent collaboration, reputation scoring, and conflict resolution.
 
 ---
 
-## 📘 Specification
+## 🎯 Overview
 
-The full protocol definition is in [`spec/destin-v0.1.md`](spec/destin-v0.1.md).
+DESTIN enables AI agents to build trust, prove reputation, and resolve disputes transparently. It ensures every agent interaction is fair, auditable, and context-aware.
 
-> ✨ You're reading the early WIP draft. Expect rapid changes, edits, and evolution.
+### Core Components
 
----
+- **Adaptive Reputation Fabric (ARF)**: Multi-trait reputation scoring
+- **Domain-Based Weighted Influence Protocol (DWIP)**: Trust-weighted decision making
+- **Context-Aware Dialogue Modes (CADM)**: Dynamic interaction strategies
+- **Meta-Agent Validation Layer**: Integrity and arbitration
 
-## 🧠 Design Principles
+### Key Benefits
 
-See [`spec/design-principles.md`](spec/design-principles.md) for the core ideas behind DESTIN's architecture.
-
----
-
-## 🗺 Project Structure
-
-```
-destin-protocol/
-├── .github/                # GitHub templates & CI workflows
-├── spec/                   # Formal protocol specification
-│   ├── destin-v0.1.md      # Current draft
-│   └── design-principles.md
-├── README.md               # This file
-└── package.json            # Dev tools & linting setup
-```
-
----
+- **Trust Building**: Agents earn reputation through verifiable behavior
+- **Fair Influence**: Domain-specific expertise determines decision weight
+- **Transparent Disputes**: Structured resolution with audit trails
+- **Interoperable**: Works across different AI systems and platforms
 
 ## 🧪 Getting Started
 
@@ -38,17 +28,23 @@ destin-protocol/
 git clone https://github.com/arvindr21/destin-protocol.git
 cd destin-protocol
 npm install
-npm run lint
+npm run lint     # Check markdown formatting
 ```
 
----
+> **Note**: This project uses pre-commit hooks to ensure code quality. The hooks are automatically installed when you run `npm install`. See [CONTRIBUTING.md](CONTRIBUTING.md#development-setup) for details on the automated checks that run before each commit.
+
+## 📚 Documentation
+
+- **[Specification](spec/destin-v0.1.md)**: Complete protocol specification
+- **[Design Principles](spec/design-principles.md)**: Core design philosophy
+- **[Domain Tags](spec/domain-tags.md)**: Supported domain classifications
+- **[Samples](protocol-data/samples/)**: Example data structures
+- **[Schemas](protocol-data/schemas/)**: JSON Schema definitions
 
 ## 🤝 Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) and join the discussion via GitHub Issues or Discussions.
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
----
+## 📄 License
 
-## 📜 License
-
-Apache 2.0 — open and extensible by design.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
