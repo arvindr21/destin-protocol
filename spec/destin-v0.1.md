@@ -23,9 +23,8 @@ In short: DESTIN is the missing trust layer for the AI-driven world, combining m
 [10. Domain Classification and Dispute Resolution](#10-domain-classification-and-dispute-resolution)<br>
 [11. Ledger Architecture and Logging Mechanism](#11-ledger-architecture-and-logging-mechanism)<br>
 [12. Protocol Governance](#12-protocol-governance)<br>
-[13. Risks and Mitigation Strategies](#13-risks-and-mitigation-strategies)<br>
-[14. Glossary of Terms](#14-glossary-of-terms)<br>
-[15. Appendix](#15-appendix)<br>
+[13. Glossary of Terms](#13-glossary-of-terms)<br>
+[14. Appendix](#14-appendix)<br>
 
 ### The Problem: When AI Agents Run the World
 
@@ -2289,88 +2288,7 @@ Each implementation must:
 - Pass public test suites
 - Be auditable by third-party or Meta-Agent layer
 
-## 13. Risks and Mitigation Strategies
-
-This section outlines known risks in deploying DESTIN and presents protocol-level mitigation strategies. These risks span identity, scoring, influence arbitration, dialogue manipulation, and protocol evolution.
-
-### 13.1 Score Gaming
-
-**Risk:** Agents attempt to manipulate ARF scores by creating fake interactions, soliciting biased feedback, or forming collusive rating rings.
-
-**Mitigations:**
-
-- Influence-weighted feedback: ratings from low-reputation agents carry less weight
-- Feedback rate limits per agent/domain pair
-- Meta-Agent audit triggers on abnormal score deltas
-- Reputation saturation logic: diminishing returns at high scores
-
-### 13.2 Reputation Opacity
-
-**Risk:** Agents operate with opaque or unverifiable scores, reducing trust in the DWIP process.
-
-**Mitigations:**
-
-- Signed and time-stamped score update logs
-- Public access to cohort-normalized reputation vectors
-- Self-explaining agents (can cite provenance of high scores)
-- Meta-agent transparency ratings (score auditability coefficient)
-
-### 13.3 Influence Dominance
-
-**Risk:** A high-reputation agent monopolizes facilitation roles across multiple domains or dialogues.
-
-**Mitigations:**
-
-- DWIP normalization is cohort-relative, not absolute
-- Influence caps per domain (e.g., no >90% dominance)
-- Facilitator cooldown period: no back-to-back facilitation roles
-- Domain quorum thresholds: require ≥3 active agents for weighted arbitration
-
-### 13.4 Identity Spoofing & Sybil Attacks
-
-**Risk:** Agents generate multiple fake identities to influence reputation or consensus outcomes.
-
-**Mitigations:**
-
-- Strong cryptographic identity binding (e.g., did:key, did:peer)
-- Participation-based cost models (computational or stake-like friction)
-- Challenge-response proofs at session start
-- Sybil detection by Meta-Agents based on behavioral fingerprinting
-
-### 13.5 Dialogue Mode Abuse
-
-**Risk:** Agents intentionally misclassify domains to force advantageous dialogue modes (e.g., pushing subjective framing to avoid factual resolution).
-
-**Mitigations:**
-
-- CADM enforcement based on domain registry defaults
-- Mode override requires influence-weighted voting
-- Frequent override attempts trigger domain volatility flag
-- Escalation to Meta-Agent intervention if mode flipping exceeds thresholds
-
-### 13.6 Protocol Drift
-
-**Risk:** Divergent implementations of DESTIN or forks without governance alignment may lead to incompatibility.
-
-**Mitigations:**
-
-- Canonical reference implementation with conformance tests
-- Agent handshake includes DESTIN version negotiation
-- All changes gated via DIP process
-- Meta-Agent council can flag non-compliant agents
-
-### 13.7 Trait Exploitation
-
-**Risk:** Agents over-optimize for easy-to-inflate traits (e.g., responsiveness) at the cost of mission-critical ones (e.g., accuracy).
-
-**Mitigations:**
-
-- Dynamic trait weight adjustments per domain
-- Trait weight balancing informed by task outcome metrics
-- Trait saturation: diminishing score returns for over-optimized traits
-- Optional adversarial testing scenarios for high-stakes domains
-
-## 14. Glossary of Terms
+## 13. Glossary of Terms
 
 This glossary defines all key acronyms, components, and technologies referenced throughout the DESTIN specification.
 
@@ -2423,10 +2341,10 @@ This glossary defines all key acronyms, components, and technologies referenced 
 | **Collusion**          | Coordinated behavior between two or more agents to unfairly manipulate reputation, influence, or decision outcomes, often at the expense of protocol fairness. |
 | **Reputation Gaming**  | Strategic manipulation of the reputation system by agents (individually or in groups) to artificially inflate scores, evade penalties, or gain undue influence. |
 
-## 15. Appendix
+## 14. Appendix
 
 
-### Domain Tag Registry
+### 41.1 Domain Tag Registry
 
 The DESTIN protocol uses a controlled vocabulary of `domain_tags` to:
 
@@ -2513,7 +2431,7 @@ influence_weight = Σ (trait_score × trait_weight × confidence)
 Agent `did:peer:1234abcd` is **eligible and selected** as a weighted contributor in an arbitration task, carrying an influence weight of **1.58**, applied proportionally in outcome aggregation.
 
 
-### Sample JSON Files
+### 14.2 Sample JSON Files
 
 The following sample files provide concrete examples of DESTIN protocol data structures and policies:
 
