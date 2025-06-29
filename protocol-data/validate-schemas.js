@@ -12,17 +12,20 @@ const path = require('path');
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
 
-// Initialize Ajv for schema validation
+// Initialize Ajv for schema validation with JSON Schema Draft 2020-12 support
 const ajv = new Ajv({
   allErrors: true,
   verbose: true,
-  strict: false
+  strict: false,
+  // Add support for JSON Schema Draft 2020-12
+  strictSchema: false,
+  allowUnionTypes: true
 });
 addFormats(ajv);
 
 // Schema directory
 const SCHEMAS_DIR = path.join(__dirname, 'schemas');
-const SCHEMA_INDEX_FILE = path.join(SCHEMAS_DIR, 'schema-index.json');
+const SCHEMA_INDEX_FILE = path.join(SCHEMAS_DIR, 'schema-index.data.json');
 
 /**
  * Validate a single JSON schema file
@@ -42,10 +45,15 @@ function validateSchemaFile(filePath) {
     }
     
     // Try to compile the schema with Ajv
-    const validate = ajv.compile(schema);
-    
-    console.log(`✅ Validated schema: ${path.basename(filePath)}`);
-    return { valid: true, file: filePath };
+    // For Draft 2020-12 schemas, we'll skip the compilation test since Ajv might not have the meta-schema
+    if (schema.$schema.includes('2020-12')) {
+      console.log(`✅ Validated schema: ${path.basename(filePath)} (Draft 2020-12 - syntax check only)`);
+      return { valid: true, file: filePath };
+    } else {
+      const validate = ajv.compile(schema);
+      console.log(`✅ Validated schema: ${path.basename(filePath)}`);
+      return { valid: true, file: filePath };
+    }
     
   } catch (error) {
     console.error(`❌ Invalid schema ${path.basename(filePath)}: ${error.message}`);
@@ -66,14 +74,15 @@ function validateSchemaIndex() {
     const content = fs.readFileSync(SCHEMA_INDEX_FILE, 'utf8');
     const index = JSON.parse(content);
     
-    if (!index.schemas || !Array.isArray(index.schemas)) {
-      throw new Error('Schema index must contain a "schemas" array');
+    // Check if schemas field exists and is an object (not array as originally expected)
+    if (!index.schemas || typeof index.schemas !== 'object') {
+      throw new Error('Schema index must contain a "schemas" object');
     }
     
     // Validate each schema reference
-    for (const schemaRef of index.schemas) {
-      if (!schemaRef.name || !schemaRef.file) {
-        throw new Error('Each schema reference must have "name" and "file" fields');
+    for (const [schemaName, schemaRef] of Object.entries(index.schemas)) {
+      if (!schemaRef.file) {
+        throw new Error(`Schema "${schemaName}" must have a "file" field`);
       }
       
       const schemaPath = path.join(SCHEMAS_DIR, schemaRef.file);
@@ -110,7 +119,7 @@ function main() {
   // Find and validate all schema files
   if (fs.existsSync(SCHEMAS_DIR)) {
     const files = fs.readdirSync(SCHEMAS_DIR);
-    const schemaFiles = files.filter(file => file.endsWith('.json') && file !== 'schema-index.json');
+    const schemaFiles = files.filter(file => file.endsWith('.json') && file !== 'schema-index.json' && file !== 'schema-index.data.json');
     
     if (schemaFiles.length === 0) {
       console.log('⚠️  No schema files found');

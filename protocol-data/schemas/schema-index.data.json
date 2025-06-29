@@ -1,0 +1,63 @@
+{
+  "protocol_version": "v0.1.0",
+  "schema_version": "v0.1.0",
+  "last_updated": "2024-06-10T12:00:00Z",
+  "schemas": {
+    "agent-definition": {
+      "file": "agent-definition.json",
+      "title": "DESTIN Agent Definition",
+      "description": "Schema for DESTIN agent identity, metadata, and reputation vectors",
+      "category": "core",
+      "dependencies": []
+    },
+    "domain-profile": {
+      "file": "domain-profile.json",
+      "title": "DESTIN Domain Profile",
+      "description": "Schema for domain-specific configuration including CADM modes and trait weights",
+      "category": "core",
+      "dependencies": []
+    },
+    "audit-log": {
+      "file": "audit-log.json",
+      "title": "DESTIN Audit Log",
+      "description": "Schema for append-only audit logs of score updates, events, and provenance",
+      "category": "core",
+      "dependencies": []
+    },
+    "anti-manipulation-policy": {
+      "file": "anti-manipulation-policy.json",
+      "title": "DESTIN Anti-Manipulation Policy",
+      "description": "Schema for anti-manipulation policies that prevent gaming of the reputation system",
+      "category": "core",
+      "dependencies": []
+    },
+    "interoperability-export": {
+      "file": "interoperability-export.json",
+      "title": "DESTIN Interoperability Export",
+      "description": "Schema for signed reputation exports for cross-system interoperability",
+      "category": "core",
+      "dependencies": []
+    },
+    "cadm-mode-selection": {
+      "file": "cadm-mode-selection.json",
+      "title": "DESTIN CADM Mode Selection",
+      "description": "Schema for context-aware dialogue mode selection and transitions",
+      "category": "core",
+      "dependencies": []
+    },
+    "dwip-influence-calculation": {
+      "file": "dwip-influence-calculation.json",
+      "title": "DESTIN DWIP Influence Calculation",
+      "description": "Schema for domain-weighted influence protocol calculations",
+      "category": "core",
+      "dependencies": []
+    },
+    "dip-proposal": {
+      "file": "dip-proposal.json",
+      "title": "DESTIN Improvement Proposal (DIP)",
+      "description": "Schema for DESTIN protocol improvement proposals and governance events",
+      "category": "governance",
+      "dependencies": []
+    }
+  }
+} 
