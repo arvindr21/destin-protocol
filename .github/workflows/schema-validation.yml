@@ -1,0 +1,52 @@
+name: Schema Validation
+
+on:
+  push:
+    paths:
+      - 'protocol-data/**'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    paths:
+      - 'protocol-data/**'
+      - 'package.json'
+      - 'package-lock.json'
+  schedule:
+    # Run daily at 2 AM UTC to catch any issues
+    - cron: '0 2 * * *'
+
+jobs:
+  validate-schemas:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate JSON schemas
+        run: npm run validate-schemas
+
+      - name: Validate sample files
+        run: npm run validate-samples
+
+      - name: Upload validation results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-results-${{ matrix.node-version }}
+          path: |
+            validation-results/
+            *.log
+          retention-days: 7 

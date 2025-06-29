@@ -7,7 +7,10 @@
     "prepare": "husky install",
     "commit": "cz",
     "lint": "markdownlint '**/*.md'",
-    "format": "prettier --write '**/*.{md,json,yml}'",
+    "lint:markdown": "markdownlint '**/*.md'",
+    "format": "prettier --write '**/*.{md,json,yml}' --ignore-path .prettierignore",
+    "format:check": "prettier --check '**/*.{md,json,yml}' --ignore-path .prettierignore",
+    "validate-schemas": "node protocol-data/validate-schemas.js",
     "validate-samples": "node protocol-data/validate-samples.js"
   },
   "keywords": [
