@@ -1,0 +1,22 @@
+{
+  "event": "mode_selection",
+  "trigger": "agent_vote",
+  "selected_mode": "synthesis",
+  "timestamp": "2025-07-15T09:30:00Z",
+  "domain_tag": "governance",
+  "votes": {
+    "did:peer:alpha": "synthesis",
+    "did:peer:beta": "debate",
+    "did:peer:gamma": "synthesis"
+  },
+  "confidence_score": 0.82,
+  "recent_mode": "debate",
+  "volatility_score": 0.25,
+  "meta_agent_flag": false,
+  "justification": "Majority of agents voted for synthesis mode due to value-driven discussion.",
+  "participating_agents": ["did:peer:alpha", "did:peer:beta", "did:peer:gamma"],
+  "interaction_id": "interaction-abcdef12",
+  "metadata": {
+    "session_id": "session-2025-07-15-01"
+  }
+}

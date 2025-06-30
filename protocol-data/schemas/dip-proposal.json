@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/dip-proposal.json",
+  "title": "DESTIN Improvement Proposal (DIP)",
+  "description": "Schema for DESTIN Improvement Proposals that govern protocol evolution",
+  "type": "object",
+  "version": "0.1.0",
+  "required": [
+    "dip_id",
+    "title",
+    "rationale",
+    "proposed_changes",
+    "impact_analysis",
+    "author",
+    "timestamp"
+  ],
+  "properties": {
+    "dip_id": {
+      "type": "string",
+      "description": "Unique identifier for the DIP",
+      "pattern": "^dip-[0-9]{4}$",
+      "examples": ["dip-0001", "dip-0042"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Short, descriptive title for the proposal",
+      "maxLength": 200,
+      "examples": [
+        "Add New Domain Tag for Healthcare",
+        "Modify ARF Decay Function"
+      ]
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Clear explanation of why this change is needed",
+      "maxLength": 5000
+    },
+    "proposed_changes": {
+      "type": "array",
+      "description": "Specific changes being proposed",
+      "items": {
+        "type": "object",
+        "required": ["component", "change_type", "description"],
+        "properties": {
+          "component": {
+            "type": "string",
+            "description": "Protocol component being modified",
+            "enum": [
+              "arf",
+              "dwip",
+              "cadm",
+              "domain_tags",
+              "governance",
+              "ledger",
+              "identity",
+              "interoperability"
+            ]
+          },
+          "change_type": {
+            "type": "string",
+            "description": "Type of change being made",
+            "enum": ["addition", "modification", "removal", "deprecation"]
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the change"
+          },
+          "backwards_compatible": {
+            "type": "boolean",
+            "description": "Whether this change is backwards compatible"
+          },
+          "migration_required": {
+            "type": "boolean",
+            "description": "Whether existing implementations need migration"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "impact_analysis": {
+      "type": "object",
+      "description": "Analysis of the proposed changes' impact",
+      "required": ["arf_impact", "dwip_impact", "cadm_impact"],
+      "properties": {
+        "arf_impact": {
+          "type": "string",
+          "description": "Impact on Adaptive Reputation Fabric",
+          "enum": ["none", "low", "medium", "high", "critical"]
+        },
+        "dwip_impact": {
+          "type": "string",
+          "description": "Impact on Domain-Weighted Influence Protocol",
+          "enum": ["none", "low", "medium", "high", "critical"]
+        },
+        "cadm_impact": {
+          "type": "string",
+          "description": "Impact on Context-Aware Dialogue Modes",
+          "enum": ["none", "low", "medium", "high", "critical"]
+        },
+        "manipulation_surface": {
+          "type": "string",
+          "description": "Assessment of new manipulation vectors",
+          "enum": ["none", "low", "medium", "high", "critical"]
+        },
+        "scoring_recalibration": {
+          "type": "boolean",
+          "description": "Whether existing scores need recalibration"
+        },
+        "interoperability_impact": {
+          "type": "string",
+          "description": "Impact on cross-system interoperability",
+          "enum": ["none", "low", "medium", "high", "critical"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "author": {
+      "type": "string",
+      "description": "DID of the proposal author",
+      "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the DIP was submitted"
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the DIP",
+      "enum": [
+        "draft",
+        "proposed",
+        "active",
+        "accepted",
+        "rejected",
+        "superseded"
+      ],
+      "default": "draft"
+    },
+    "simulation_results": {
+      "type": "object",
+      "description": "Results from simulation or testing",
+      "properties": {
+        "simulated": {
+          "type": "boolean",
+          "description": "Whether the proposal was simulated"
+        },
+        "test_environment": {
+          "type": "string",
+          "description": "Description of test environment used"
+        },
+        "performance_impact": {
+          "type": "string",
+          "description": "Performance impact assessment",
+          "enum": ["none", "low", "medium", "high"]
+        },
+        "security_analysis": {
+          "type": "string",
+          "description": "Security analysis results"
+        }
+      },
+      "additionalProperties": false
+    },
+    "reference_implementation": {
+      "type": "object",
+      "description": "Optional reference implementation details",
+      "properties": {
+        "repository_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to reference implementation repository"
+        },
+        "branch": {
+          "type": "string",
+          "description": "Branch containing the implementation"
+        },
+        "test_coverage": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Test coverage percentage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "governance_compliance": {
+      "type": "object",
+      "description": "Compliance with governance requirements",
+      "properties": {
+        "retention_impact": {
+          "type": "string",
+          "description": "Impact on data retention requirements",
+          "enum": ["none", "low", "medium", "high"]
+        },
+        "ledger_impact": {
+          "type": "string",
+          "description": "Impact on ledger architecture",
+          "enum": ["none", "low", "medium", "high"]
+        },
+        "audit_impact": {
+          "type": "string",
+          "description": "Impact on auditability requirements",
+          "enum": ["none", "low", "medium", "high"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "voting_results": {
+      "type": "object",
+      "description": "Results from council voting",
+      "properties": {
+        "total_votes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of votes cast"
+        },
+        "approve_votes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of approve votes"
+        },
+        "reject_votes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of reject votes"
+        },
+        "abstain_votes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of abstain votes"
+        },
+        "quorum_reached": {
+          "type": "boolean",
+          "description": "Whether voting quorum was reached"
+        },
+        "final_decision": {
+          "type": "string",
+          "enum": ["approved", "rejected", "pending", "deferred"]
+        },
+        "decision_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when decision was made"
+        }
+      },
+      "additionalProperties": false
+    },
+    "activation_window": {
+      "type": "object",
+      "description": "Timeline for DIP activation",
+      "properties": {
+        "proposed_activation": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Proposed activation date"
+        },
+        "actual_activation": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Actual activation date (null if not yet activated)"
+        },
+        "deprecation_notice_days": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Days of notice before deprecation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional proposal metadata",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "dip_id": "dip-0001",
+      "title": "Add Healthcare Domain Tag",
+      "rationale": "Healthcare applications require specialized scoring and dialogue modes for patient safety and regulatory compliance.",
+      "proposed_changes": [
+        {
+          "component": "domain_tags",
+          "change_type": "addition",
+          "description": "Add 'healthcare' domain tag with resolution mode and high accuracy weighting",
+          "backwards_compatible": true,
+          "migration_required": false
+        }
+      ],
+      "impact_analysis": {
+        "arf_impact": "low",
+        "dwip_impact": "low",
+        "cadm_impact": "none",
+        "manipulation_surface": "low",
+        "scoring_recalibration": false,
+        "interoperability_impact": "none"
+      },
+      "author": "did:peer:healthcare-advocate",
+      "timestamp": "2025-07-01T12:00:00Z",
+      "status": "proposed",
+      "governance_compliance": {
+        "retention_impact": "low",
+        "ledger_impact": "none",
+        "audit_impact": "low"
+      }
+    }
+  ]
+}

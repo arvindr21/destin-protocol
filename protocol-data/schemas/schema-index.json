@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/schema-index.json",
+  "title": "DESTIN Protocol Schema Index",
+  "description": "Central registry of all DESTIN protocol JSON schemas",
+  "type": "object",
+  "version": "0.1.0",
+  "required": ["protocol_version", "schemas"],
+  "properties": {
+    "protocol_version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "DESTIN protocol version these schemas correspond to",
+      "const": "v0.1.0"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "Version of the schema definitions themselves",
+      "const": "v0.1.0"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when schemas were last updated"
+    },
+    "schemas": {
+      "type": "object",
+      "description": "Registry of all available schemas",
+      "properties": {
+        "agent-definition": {
+          "type": "object",
+          "description": "Agent identity and metadata structure",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "agent-definition.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN Agent Definition"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for DESTIN agent identity, metadata, and reputation vectors"
+            },
+            "category": {
+              "type": "string",
+              "const": "core"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        },
+        "domain-profile": {
+          "type": "object",
+          "description": "Domain-specific configuration and trait weights",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "domain-profile.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN Domain Profile"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for domain-specific configuration including CADM modes and trait weights"
+            },
+            "category": {
+              "type": "string",
+              "const": "core"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        },
+        "audit-log": {
+          "type": "object",
+          "description": "Score update and event logging format",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "audit-log.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN Audit Log"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for append-only audit logs of score updates, events, and provenance"
+            },
+            "category": {
+              "type": "string",
+              "const": "core"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        },
+        "anti-manipulation-policy": {
+          "type": "object",
+          "description": "Manipulation prevention configuration",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "anti-manipulation-policy.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN Anti-Manipulation Policy"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for anti-manipulation policies that prevent gaming of the reputation system"
+            },
+            "category": {
+              "type": "string",
+              "const": "core"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        },
+        "interoperability-export": {
+          "type": "object",
+          "description": "Cross-system reputation export format",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "interoperability-export.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN Interoperability Export"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for signed reputation exports for cross-system interoperability"
+            },
+            "category": {
+              "type": "string",
+              "const": "core"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        },
+        "cadm-mode-selection": {
+          "type": "object",
+          "description": "Context-Aware Dialogue Mode selection events",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "cadm-mode-selection.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN CADM Mode Selection"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for Context-Aware Dialogue Mode selection events"
+            },
+            "category": {
+              "type": "string",
+              "const": "validation"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        },
+        "dwip-influence-calculation": {
+          "type": "object",
+          "description": "Domain-Weighted Influence Protocol calculations",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "dwip-influence-calculation.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN DWIP Influence Calculation"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for Domain-Weighted Influence Protocol calculations"
+            },
+            "category": {
+              "type": "string",
+              "const": "validation"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        },
+        "dip-proposal": {
+          "type": "object",
+          "description": "DESTIN Improvement Proposal format",
+          "properties": {
+            "file": {
+              "type": "string",
+              "const": "dip-proposal.json"
+            },
+            "title": {
+              "type": "string",
+              "const": "DESTIN Improvement Proposal (DIP)"
+            },
+            "description": {
+              "type": "string",
+              "const": "Schema for DESTIN Improvement Proposals that govern protocol evolution"
+            },
+            "category": {
+              "type": "string",
+              "const": "governance"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "const": []
+            }
+          },
+          "required": [
+            "file",
+            "title",
+            "description",
+            "category",
+            "dependencies"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "categories": {
+      "type": "object",
+      "description": "Schema categories and their descriptions",
+      "properties": {
+        "core": {
+          "type": "string",
+          "const": "Core protocol data structures used by all DESTIN components"
+        },
+        "validation": {
+          "type": "string",
+          "const": "Validation and calculation schemas for protocol mechanics"
+        },
+        "governance": {
+          "type": "string",
+          "const": "Governance and evolution schemas for protocol management"
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation_tools": {
+      "type": "array",
+      "description": "Recommended validation tools and libraries",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the validation tool"
+          },
+          "language": {
+            "type": "string",
+            "description": "Programming language"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the tool"
+          },
+          "recommended": {
+            "type": "boolean",
+            "description": "Whether this tool is recommended"
+          }
+        },
+        "required": ["name", "language", "url", "recommended"]
+      },
+      "examples": [
+        {
+          "name": "Ajv",
+          "language": "JavaScript",
+          "url": "https://ajv.js.org/",
+          "recommended": true
+        },
+        {
+          "name": "jsonschema",
+          "language": "Python",
+          "url": "https://python-jsonschema.readthedocs.io/",
+          "recommended": true
+        },
+        {
+          "name": "json-schema-validator",
+          "language": "Java",
+          "url": "https://github.com/networknt/json-schema-validator",
+          "recommended": true
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "protocol_version": "v0.1.0",
+      "schema_version": "v0.1.0",
+      "last_updated": "2025-07-01T12:00:00Z",
+      "schemas": {
+        "agent-definition": {
+          "file": "agent-definition.json",
+          "title": "DESTIN Agent Definition",
+          "description": "Schema for DESTIN agent identity, metadata, and reputation vectors",
+          "category": "core",
+          "dependencies": []
+        }
+      },
+      "categories": {
+        "core": "Core protocol data structures used by all DESTIN components",
+        "validation": "Validation and calculation schemas for protocol mechanics",
+        "governance": "Governance and evolution schemas for protocol management"
+      },
+      "validation_tools": [
+        {
+          "name": "Ajv",
+          "language": "JavaScript",
+          "url": "https://ajv.js.org/",
+          "recommended": true
+        }
+      ]
+    }
+  ]
+}

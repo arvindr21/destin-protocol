@@ -1,0 +1,17 @@
+{
+  "domain": "law",
+  "default_modes": ["resolution"],
+  "trait_weights": {
+    "integrity": 1.2,
+    "explainability": 1.1,
+    "helpfulness": 0.9,
+    "efficiency": 0.7
+  },
+  "scoring_modifiers": {
+    "trust_thresholds": {
+      "facilitator": 0.8,
+      "validator": 0.9
+    }
+  },
+  "volatility_score": 0.05
+}

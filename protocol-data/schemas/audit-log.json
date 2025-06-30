@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/audit-log.json",
+  "title": "DESTIN Audit Log",
+  "description": "Schema for append-only audit logs of score updates, events, and provenance",
+  "type": "array",
+  "version": "0.1.0",
+  "items": {
+    "type": "object",
+    "required": [
+      "timestamp",
+      "source",
+      "trait",
+      "delta",
+      "domain",
+      "cohort_id"
+    ],
+    "properties": {
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "ISO 8601 timestamp when the update occurred"
+      },
+      "source": {
+        "type": "string",
+        "description": "What triggered the update",
+        "enum": [
+          "peer_endorsement",
+          "task_outcome",
+          "human_override",
+          "decay",
+          "interaction",
+          "meta_agent_decision",
+          "dispute_resolution",
+          "system_correction"
+        ]
+      },
+      "trait": {
+        "type": "string",
+        "description": "Which ARF trait was impacted",
+        "enum": [
+          "accuracy",
+          "helpfulness",
+          "integrity",
+          "civility",
+          "responsiveness",
+          "self_awareness",
+          "consistency",
+          "transparency",
+          "cooperativeness",
+          "humility",
+          "efficiency",
+          "neutrality",
+          "intent_alignment",
+          "graceful_degradation",
+          "adaptivity",
+          "explainability",
+          "trust_calibration"
+        ]
+      },
+      "delta": {
+        "type": "number",
+        "description": "Numerical change applied to the score",
+        "minimum": -1.0,
+        "maximum": 1.0
+      },
+      "domain": {
+        "type": "string",
+        "description": "Domain tag this score applies to",
+        "enum": [
+          "general",
+          "law",
+          "finance",
+          "medicine",
+          "education",
+          "science",
+          "governance",
+          "negotiation",
+          "news",
+          "cooking",
+          "home-automation",
+          "commerce",
+          "psychology",
+          "arts",
+          "ethics"
+        ]
+      },
+      "cohort_id": {
+        "type": "string",
+        "description": "The active cohort context",
+        "pattern": "^[a-z]+-[0-9]{4}-Q[1-4]$",
+        "examples": ["law-2025-Q3", "gov-2025-Q3"]
+      },
+      "validator_id": {
+        "type": "string",
+        "description": "Optional validator who validated the change",
+        "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+      },
+      "dispute_id": {
+        "type": "string",
+        "description": "Optional dispute ID if the change resulted from arbitration",
+        "pattern": "^dispute-[a-f0-9]{8}$"
+      },
+      "interaction_id": {
+        "type": "string",
+        "description": "Optional interaction ID that triggered this update",
+        "pattern": "^interaction-[a-f0-9]{8}$"
+      },
+      "old_score": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "Previous trait score before the update"
+      },
+      "new_score": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "New trait score after the update"
+      },
+      "confidence": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "Confidence level in this score update"
+      },
+      "justification": {
+        "type": "string",
+        "maxLength": 1000,
+        "description": "Optional human-readable justification for the update"
+      },
+      "metadata": {
+        "type": "object",
+        "description": "Additional context-specific metadata",
+        "additionalProperties": true
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    [
+      {
+        "timestamp": "2025-07-01T12:30:00Z",
+        "source": "peer_endorsement",
+        "trait": "integrity",
+        "delta": 0.02,
+        "domain": "law",
+        "cohort_id": "law-2025-Q3",
+        "validator_id": "did:validator:0xABC",
+        "interaction_id": "interaction-12345678",
+        "old_score": 0.89,
+        "new_score": 0.91,
+        "confidence": 0.95
+      },
+      {
+        "timestamp": "2025-07-02T09:00:00Z",
+        "source": "task_outcome",
+        "trait": "intent_alignment",
+        "delta": -0.01,
+        "domain": "governance",
+        "cohort_id": "gov-2025-Q3",
+        "old_score": 0.86,
+        "new_score": 0.85,
+        "confidence": 0.88
+      }
+    ]
+  ]
+}
