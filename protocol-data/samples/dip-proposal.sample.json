@@ -1,0 +1,58 @@
+{
+  "dip_id": "dip-0007",
+  "title": "Add New Domain Tag for Healthcare",
+  "rationale": "The protocol needs to support healthcare-specific agent interactions and scoring.",
+  "proposed_changes": [
+    {
+      "component": "domain_tags",
+      "change_type": "addition",
+      "description": "Add 'healthcare' to the list of valid domain tags.",
+      "backwards_compatible": true,
+      "migration_required": false
+    }
+  ],
+  "impact_analysis": {
+    "arf_impact": "low",
+    "dwip_impact": "low",
+    "cadm_impact": "none",
+    "manipulation_surface": "none",
+    "scoring_recalibration": false,
+    "interoperability_impact": "low"
+  },
+  "author": "did:peer:proposer123",
+  "timestamp": "2025-07-15T10:00:00Z",
+  "status": "proposed",
+  "simulation_results": {
+    "simulated": true,
+    "test_environment": "staging-net-2025-07",
+    "performance_impact": "none",
+    "security_analysis": "No new attack vectors identified."
+  },
+  "reference_implementation": {
+    "repository_url": "https://github.com/destin-protocol/destin-protocol/pull/42",
+    "branch": "feature/healthcare-domain-tag",
+    "test_coverage": 0.95
+  },
+  "governance_compliance": {
+    "retention_impact": "none",
+    "ledger_impact": "none",
+    "audit_impact": "none"
+  },
+  "voting_results": {
+    "total_votes": 7,
+    "approve_votes": 6,
+    "reject_votes": 1,
+    "abstain_votes": 0,
+    "quorum_reached": true,
+    "final_decision": "approved",
+    "decision_timestamp": "2025-07-16T12:00:00Z"
+  },
+  "activation_window": {
+    "proposed_activation": "2025-08-01T00:00:00Z",
+    "actual_activation": null,
+    "deprecation_notice_days": 0
+  },
+  "metadata": {
+    "discussion_url": "https://github.com/destin-protocol/destin-protocol/discussions/77"
+  }
+}

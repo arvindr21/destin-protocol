@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/dwip-influence-calculation.json",
+  "title": "DESTIN DWIP Influence Calculation",
+  "description": "Schema for Domain-Weighted Influence Protocol calculations",
+  "type": "object",
+  "version": "0.1.0",
+  "required": [
+    "agent_id",
+    "domain",
+    "cadm_mode",
+    "influence_score",
+    "timestamp"
+  ],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Agent identifier",
+      "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domain context for influence calculation",
+      "enum": [
+        "general",
+        "law",
+        "finance",
+        "medicine",
+        "education",
+        "science",
+        "governance",
+        "negotiation",
+        "news",
+        "cooking",
+        "home-automation",
+        "commerce",
+        "psychology",
+        "arts",
+        "ethics"
+      ]
+    },
+    "cadm_mode": {
+      "type": "string",
+      "description": "Active CADM dialogue mode",
+      "enum": ["resolution", "synthesis", "debate"]
+    },
+    "influence_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "description": "Final calculated influence weight"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when calculation was performed"
+    },
+    "trait_scores": {
+      "type": "object",
+      "description": "Individual trait scores used in calculation",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0
+      },
+      "propertyNames": {
+        "enum": [
+          "accuracy",
+          "helpfulness",
+          "integrity",
+          "civility",
+          "responsiveness",
+          "self_awareness",
+          "consistency",
+          "transparency",
+          "cooperativeness",
+          "humility",
+          "efficiency",
+          "neutrality",
+          "intent_alignment",
+          "graceful_degradation",
+          "adaptivity",
+          "explainability",
+          "trust_calibration"
+        ]
+      }
+    },
+    "trait_weights": {
+      "type": "object",
+      "description": "Domain-specific trait weights applied",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 3.0
+      }
+    },
+    "confidence_factors": {
+      "type": "object",
+      "description": "Confidence factors for each trait",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0
+      }
+    },
+    "stability_scores": {
+      "type": "object",
+      "description": "Stability scores for each trait",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0
+      }
+    },
+    "cohort_id": {
+      "type": "string",
+      "description": "Cohort context for normalization",
+      "pattern": "^[a-z]+-[0-9]{4}-Q[1-4]$"
+    },
+    "normalization_method": {
+      "type": "string",
+      "description": "Method used for cohort normalization",
+      "enum": ["z_score", "min_max", "quantile"]
+    },
+    "decay_applied": {
+      "type": "boolean",
+      "description": "Whether time decay was applied to scores"
+    },
+    "decay_factor": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Overall decay factor applied"
+    },
+    "rate_limited": {
+      "type": "boolean",
+      "description": "Whether influence was rate-limited"
+    },
+    "trust_radius_filtered": {
+      "type": "boolean",
+      "description": "Whether trust radius filtering was applied"
+    },
+    "role_eligibility": {
+      "type": "object",
+      "description": "Eligibility for various roles",
+      "properties": {
+        "facilitator": {
+          "type": "boolean",
+          "description": "Whether agent qualifies as facilitator"
+        },
+        "validator": {
+          "type": "boolean",
+          "description": "Whether agent qualifies as validator"
+        },
+        "meta_agent": {
+          "type": "boolean",
+          "description": "Whether agent qualifies as meta-agent"
+        }
+      },
+      "additionalProperties": false
+    },
+    "calculation_breakdown": {
+      "type": "object",
+      "description": "Detailed breakdown of influence calculation",
+      "properties": {
+        "raw_trait_contributions": {
+          "type": "object",
+          "description": "Individual trait contributions before weighting"
+        },
+        "weighted_contributions": {
+          "type": "object",
+          "description": "Trait contributions after domain weighting"
+        },
+        "confidence_adjusted": {
+          "type": "object",
+          "description": "Contributions after confidence adjustment"
+        },
+        "decay_adjusted": {
+          "type": "object",
+          "description": "Contributions after decay adjustment"
+        },
+        "normalized_score": {
+          "type": "number",
+          "description": "Final normalized influence score"
+        }
+      },
+      "additionalProperties": false
+    },
+    "interaction_id": {
+      "type": "string",
+      "description": "ID of the interaction this influence applies to",
+      "pattern": "^interaction-[a-f0-9]{8}$"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional calculation metadata",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "agent_id": "did:peer:1234abcd",
+      "domain": "law",
+      "cadm_mode": "resolution",
+      "influence_score": 1.58,
+      "timestamp": "2025-07-01T12:00:00Z",
+      "trait_scores": {
+        "integrity": 0.91,
+        "explainability": 0.86
+      },
+      "trait_weights": {
+        "integrity": 1.2,
+        "explainability": 1.1
+      },
+      "confidence_factors": {
+        "integrity": 0.715,
+        "explainability": 0.846
+      },
+      "stability_scores": {
+        "integrity": 0.98,
+        "explainability": 0.94
+      },
+      "cohort_id": "law-2025-Q3",
+      "normalization_method": "z_score",
+      "decay_applied": true,
+      "decay_factor": 0.85,
+      "rate_limited": false,
+      "trust_radius_filtered": false,
+      "role_eligibility": {
+        "facilitator": true,
+        "validator": false,
+        "meta_agent": false
+      },
+      "calculation_breakdown": {
+        "raw_trait_contributions": {
+          "integrity": 0.91,
+          "explainability": 0.86
+        },
+        "weighted_contributions": {
+          "integrity": 1.092,
+          "explainability": 0.946
+        },
+        "confidence_adjusted": {
+          "integrity": 0.78,
+          "explainability": 0.8
+        },
+        "decay_adjusted": {
+          "integrity": 0.78,
+          "explainability": 0.8
+        },
+        "normalized_score": 1.58
+      },
+      "interaction_id": "interaction-12345678"
+    }
+  ]
+}

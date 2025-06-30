@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/interoperability-export.json",
+  "title": "DESTIN Interoperability Export",
+  "description": "Schema for signed reputation exports for cross-system interoperability",
+  "type": "object",
+  "version": "0.1.0",
+  "required": [
+    "agent_id",
+    "domain",
+    "timestamp",
+    "reputation_vector",
+    "signature"
+  ],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Cryptographically verifiable agent identifier",
+      "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$",
+      "examples": [
+        "did:peer:1234abcd",
+        "did:key:z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA"
+      ]
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domain tag for the exported reputation vector",
+      "enum": [
+        "general",
+        "law",
+        "finance",
+        "medicine",
+        "education",
+        "science",
+        "governance",
+        "negotiation",
+        "news",
+        "cooking",
+        "home-automation",
+        "commerce",
+        "psychology",
+        "arts",
+        "ethics"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the export was created"
+    },
+    "reputation_vector": {
+      "type": "object",
+      "description": "Domain-scoped ARF trait scores",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "Normalized trait score between 0.0 and 1.0"
+      },
+      "propertyNames": {
+        "enum": [
+          "accuracy",
+          "helpfulness",
+          "integrity",
+          "civility",
+          "responsiveness",
+          "self_awareness",
+          "consistency",
+          "transparency",
+          "cooperativeness",
+          "humility",
+          "efficiency",
+          "neutrality",
+          "intent_alignment",
+          "graceful_degradation",
+          "adaptivity",
+          "explainability",
+          "trust_calibration"
+        ]
+      },
+      "minProperties": 1
+    },
+    "signature": {
+      "type": "string",
+      "description": "Cryptographic signature of the export data",
+      "pattern": "^0x[a-fA-F0-9]+$",
+      "minLength": 66,
+      "maxLength": 132
+    },
+    "signature_algorithm": {
+      "type": "string",
+      "description": "Algorithm used for the signature",
+      "enum": ["secp256k1", "ed25519", "rsa-2048", "rsa-4096"],
+      "default": "secp256k1"
+    },
+    "public_key": {
+      "type": "string",
+      "description": "Public key used for signature verification",
+      "minLength": 32,
+      "maxLength": 256
+    },
+    "exporting_system": {
+      "type": "string",
+      "description": "Identifier of the system that created this export",
+      "maxLength": 100
+    },
+    "exporting_validator": {
+      "type": "string",
+      "description": "Validator that certified this export",
+      "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+    },
+    "confidence_scores": {
+      "type": "object",
+      "description": "Confidence levels for each trait score",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "Confidence level for the trait score"
+      }
+    },
+    "stability_scores": {
+      "type": "object",
+      "description": "Stability indicators for each trait score",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "Stability score indicating consistency over time"
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the most recent score update in this vector"
+    },
+    "cohort_context": {
+      "type": "string",
+      "description": "Cohort context for score normalization",
+      "pattern": "^[a-z]+-[0-9]{4}-Q[1-4]$"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional export metadata",
+      "properties": {
+        "protocol_version": {
+          "type": "string",
+          "pattern": "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+          "description": "DESTIN protocol version used for this export"
+        },
+        "export_reason": {
+          "type": "string",
+          "enum": ["interoperability", "backup", "audit", "migration"],
+          "description": "Reason for creating this export"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional expiration timestamp for the export"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "agent_id": "did:peer:1234abcd",
+      "domain": "law",
+      "timestamp": "2025-06-30T12:00:00Z",
+      "reputation_vector": {
+        "integrity": 0.91,
+        "explainability": 0.88
+      },
+      "signature": "0xdeadbeefcafebabe11223344556677889900aabbccddeeff",
+      "signature_algorithm": "secp256k1",
+      "public_key": "z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA",
+      "exporting_system": "destin-validator-v1",
+      "exporting_validator": "did:validator:0xABC",
+      "confidence_scores": {
+        "integrity": 0.95,
+        "explainability": 0.92
+      },
+      "stability_scores": {
+        "integrity": 0.98,
+        "explainability": 0.94
+      },
+      "last_updated": "2025-06-29T15:30:00Z",
+      "cohort_context": "law-2025-Q2",
+      "metadata": {
+        "protocol_version": "v0.1",
+        "export_reason": "interoperability"
+      }
+    }
+  ]
+}

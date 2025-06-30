@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/anti-manipulation-policy.json",
+  "title": "DESTIN Anti-Manipulation Policy",
+  "description": "Schema for anti-manipulation policies that prevent gaming of the reputation system",
+  "type": "object",
+  "version": "0.1.0",
+  "required": [
+    "influence_rate_limit",
+    "confidence_weighting",
+    "trust_radius",
+    "anomaly_detection"
+  ],
+  "properties": {
+    "influence_rate_limit": {
+      "type": "string",
+      "description": "Maximum score delta any agent can induce per unit time",
+      "pattern": "^[0-9]+\\.[0-9]+/(trait|agent|domain)/(day|hour|minute)$",
+      "examples": ["0.05/trait/day", "0.1/agent/hour", "0.02/domain/minute"]
+    },
+    "confidence_weighting": {
+      "type": "boolean",
+      "description": "Whether peer influence is scaled by the reputation of the scorer"
+    },
+    "trust_radius": {
+      "type": "object",
+      "description": "Limits peer impact to trusted agents",
+      "required": ["min_reputation_threshold"],
+      "properties": {
+        "min_reputation_threshold": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Minimum reputation score required for peer influence"
+        },
+        "shared_domain_required": {
+          "type": "boolean",
+          "description": "Whether agents must share domain overlap for influence",
+          "default": true
+        },
+        "recent_interaction_required": {
+          "type": "boolean",
+          "description": "Whether agents must have recent interaction history",
+          "default": false
+        },
+        "interaction_window_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 365,
+          "description": "Number of days for recent interaction window",
+          "default": 30
+        }
+      },
+      "additionalProperties": false
+    },
+    "anomaly_detection": {
+      "type": "array",
+      "description": "Types of anomalies to detect and flag",
+      "items": {
+        "type": "string",
+        "enum": [
+          "score_spikes",
+          "feedback_loops",
+          "collusion_rings",
+          "sybil_attacks",
+          "reputation_attacks",
+          "decay_gaming",
+          "domain_hopping",
+          "influence_manipulation"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "behavioral_throttling": {
+      "type": "object",
+      "description": "Rate limiting for legitimate agent behavior",
+      "properties": {
+        "max_score_delta_per_day": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Maximum total score change per day per agent"
+        },
+        "max_endorsements_per_day": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum endorsements an agent can give per day"
+        },
+        "max_challenges_per_day": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Maximum challenges an agent can initiate per day"
+        },
+        "cooldown_period_hours": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 168,
+          "description": "Cooldown period between similar actions",
+          "default": 24
+        }
+      },
+      "additionalProperties": false
+    },
+    "challenge_and_prove": {
+      "type": "object",
+      "description": "Configuration for challenge-and-prove mechanisms",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether challenge-and-prove is enabled",
+          "default": true
+        },
+        "auto_protection_threshold": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Score drop threshold that triggers automatic protection",
+          "default": 0.25
+        },
+        "challenge_bond_required": {
+          "type": "boolean",
+          "description": "Whether challenges require a collateral bond",
+          "default": false
+        },
+        "bond_amount": {
+          "type": "number",
+          "minimum": 0.0,
+          "description": "Amount of bond required for high-impact disputes"
+        }
+      },
+      "additionalProperties": false
+    },
+    "audit_trails": {
+      "type": "object",
+      "description": "Audit trail configuration",
+      "properties": {
+        "log_all_score_changes": {
+          "type": "boolean",
+          "description": "Whether to log all score changes",
+          "default": true
+        },
+        "log_feedback_cycles": {
+          "type": "boolean",
+          "description": "Whether to log feedback cycles between agents",
+          "default": true
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 3650,
+          "description": "Number of days to retain audit logs",
+          "default": 365
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "influence_rate_limit": "0.05/trait/day",
+      "confidence_weighting": true,
+      "trust_radius": {
+        "min_reputation_threshold": 0.6,
+        "shared_domain_required": true
+      },
+      "anomaly_detection": [
+        "score_spikes",
+        "feedback_loops",
+        "collusion_rings"
+      ],
+      "behavioral_throttling": {
+        "max_score_delta_per_day": 0.1
+      },
+      "challenge_and_prove": {
+        "enabled": true,
+        "auto_protection_threshold": 0.25
+      },
+      "audit_trails": {
+        "log_all_score_changes": true,
+        "retention_days": 365
+      }
+    }
+  ]
+}

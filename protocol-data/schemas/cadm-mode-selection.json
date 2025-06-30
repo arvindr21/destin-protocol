@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/cadm-mode-selection.json",
+  "title": "DESTIN CADM Mode Selection",
+  "description": "Schema for Context-Aware Dialogue Mode selection events",
+  "type": "object",
+  "version": "0.1.0",
+  "required": ["event", "trigger", "selected_mode", "timestamp"],
+  "properties": {
+    "event": {
+      "type": "string",
+      "const": "mode_selection",
+      "description": "Event type identifier"
+    },
+    "trigger": {
+      "type": "string",
+      "description": "What triggered the mode selection",
+      "enum": [
+        "agent_vote",
+        "domain_metadata",
+        "interaction_history",
+        "meta_agent_classification",
+        "topic_shift",
+        "volatility_trigger",
+        "meta_agent_audit"
+      ]
+    },
+    "selected_mode": {
+      "type": "string",
+      "description": "The CADM mode that was selected",
+      "enum": ["resolution", "synthesis", "debate"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the selection occurred"
+    },
+    "domain_tag": {
+      "type": "string",
+      "description": "Domain context for the mode selection",
+      "enum": [
+        "general",
+        "law",
+        "finance",
+        "medicine",
+        "education",
+        "science",
+        "governance",
+        "negotiation",
+        "news",
+        "cooking",
+        "home-automation",
+        "commerce",
+        "psychology",
+        "arts",
+        "ethics"
+      ]
+    },
+    "votes": {
+      "type": "object",
+      "description": "Agent votes for different modes",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["resolution", "synthesis", "debate"]
+      },
+      "examples": [
+        {
+          "agent1": "resolution",
+          "agent2": "synthesis"
+        }
+      ]
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Confidence level in the mode selection decision"
+    },
+    "recent_mode": {
+      "type": "string",
+      "description": "Previous CADM mode if this is a mode switch",
+      "enum": ["resolution", "synthesis", "debate"]
+    },
+    "volatility_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Domain volatility score that influenced the decision"
+    },
+    "meta_agent_flag": {
+      "type": "boolean",
+      "description": "Whether a meta-agent was involved in the decision"
+    },
+    "justification": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Human-readable justification for the mode selection"
+    },
+    "participating_agents": {
+      "type": "array",
+      "description": "List of agents that participated in the selection",
+      "items": {
+        "type": "string",
+        "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+      },
+      "uniqueItems": true
+    },
+    "interaction_id": {
+      "type": "string",
+      "description": "ID of the interaction this mode selection applies to",
+      "pattern": "^interaction-[a-f0-9]{8}$"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional context-specific metadata",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "event": "mode_selection",
+      "trigger": "agent_vote",
+      "selected_mode": "resolution",
+      "timestamp": "2025-07-01T12:00:00Z",
+      "domain_tag": "science",
+      "votes": {
+        "agent1": "resolution",
+        "agent2": "synthesis"
+      },
+      "confidence_score": 0.78,
+      "participating_agents": ["did:peer:agent1", "did:peer:agent2"],
+      "interaction_id": "interaction-12345678",
+      "justification": "Scientific peer review requires factual, verifiable resolution mode"
+    }
+  ]
+}
