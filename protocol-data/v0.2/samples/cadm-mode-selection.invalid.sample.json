@@ -13,4 +13,4 @@
   "participating_agents": ["did:peer:alpha", "did:peer:beta", "did:peer:gamma"],
   "interaction_id": "interaction-abcdef12",
   "extra_field": "not allowed"
-} 
+}
