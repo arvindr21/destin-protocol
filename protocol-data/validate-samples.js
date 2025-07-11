@@ -5,12 +5,26 @@
  * 
  * This script automatically discovers and validates all sample JSON files against their corresponding schemas
  * to ensure they comply with the DESTIN protocol specification.
+ *
+ * Now supports versioned directories via --version argument (e.g., --version v0.2)
  */
 
 const fs = require('fs');
 const path = require('path');
 const Ajv = require('ajv/dist/2020').default;
 const addFormats = require('ajv-formats');
+
+// Parse version argument
+const argv = process.argv;
+let version = 'v0.1';
+const versionArgIndex = argv.findIndex(arg => arg === '--version');
+if (versionArgIndex !== -1 && argv[versionArgIndex + 1]) {
+  version = argv[versionArgIndex + 1];
+}
+
+const baseDir = path.join(__dirname, version);
+const schemasDir = path.join(baseDir, 'schemas');
+const samplesDir = path.join(baseDir, 'samples');
 
 // Initialize Ajv with JSON Schema 2020-12 support
 const ajv = new Ajv({
@@ -41,7 +55,10 @@ function log(message, color = '') {
 }
 
 function discoverSamples() {
-  const samplesDir = path.join(__dirname, 'samples');
+  if (!fs.existsSync(samplesDir)) {
+    log(`Samples directory not found: ${samplesDir}`, colors.red);
+    process.exit(1);
+  }
   const sampleFiles = fs.readdirSync(samplesDir)
     .filter(file => file.endsWith('.sample.json'))
     .map(file => file.replace('.sample.json', ''));
@@ -67,7 +84,7 @@ function mapSampleToSchema(sampleName) {
 }
 
 function loadSchema(schemaFile) {
-  const schemaPath = path.join(__dirname, 'schemas', `${schemaFile}.json`);
+  const schemaPath = path.join(schemasDir, `${schemaFile}.json`);
   
   try {
     const schemaData = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
@@ -85,7 +102,7 @@ function loadSchema(schemaFile) {
 }
 
 function validateSample(sampleFile, schemaFile) {
-  const samplePath = path.join(__dirname, 'samples', `${sampleFile}.sample.json`);
+  const samplePath = path.join(samplesDir, `${sampleFile}.sample.json`);
   
   try {
     // Read and parse sample
@@ -120,47 +137,48 @@ function validateSample(sampleFile, schemaFile) {
 
 function main() {
   log('🔍 DESTIN Protocol Sample Validation', colors.bold + colors.blue);
-  log('=====================================\n', colors.blue);
-  
+  log('=====================================', colors.blue);
+  log(`Version: ${version}\n`, colors.yellow);
+
   // Discover all sample files
   const sampleFiles = discoverSamples();
-  
+
   if (sampleFiles.length === 0) {
     log('⚠️  No sample files found in samples/ directory', colors.yellow);
     process.exit(0);
   }
-  
+
   log(`📁 Found ${sampleFiles.length} sample files:`, colors.blue);
   sampleFiles.forEach(file => log(`   - ${file}.sample.json`, colors.blue));
   log('');
-  
+
   const results = [];
   let totalSamples = 0;
   let validSamples = 0;
-  
+
   for (const sampleFile of sampleFiles) {
     totalSamples++;
     const schemaFile = mapSampleToSchema(sampleFile);
-    
+
     log(`Validating ${sampleFile}.sample.json against ${schemaFile}.json...`, colors.yellow);
-    
+
     const result = validateSample(sampleFile, schemaFile);
     results.push({ sampleFile, schemaFile, ...result });
-    
+
     if (result.valid) {
       validSamples++;
     }
-    
+
     log(''); // Empty line for readability
   }
-  
+
   // Summary
   log('📊 Validation Summary', colors.bold + colors.blue);
   log('====================', colors.blue);
   log(`Total samples: ${totalSamples}`, colors.blue);
   log(`Valid samples: ${validSamples}`, colors.green);
   log(`Invalid samples: ${totalSamples - validSamples}`, colors.red);
-  
+
   if (validSamples === totalSamples) {
     log('\n🎉 All samples are valid!', colors.bold + colors.green);
     process.exit(0);

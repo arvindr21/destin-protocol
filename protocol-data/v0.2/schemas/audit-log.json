@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/audit-log.json",
+  "title": "DESTIN Audit Log",
+  "description": "Schema for append-only audit logs of score updates, events, and provenance",
+  "version": "0.2.0",
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "timestamp",
+          "source",
+          "trait",
+          "delta",
+          "domain",
+          "cohort_id"
+        ],
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "source": { "type": "string" },
+          "trait": { "type": "string" },
+          "delta": { "type": "number" },
+          "domain": { "type": "string" },
+          "cohort_id": { "type": "string" },
+          "validator_id": { "type": "string" },
+          "dispute_id": { "type": "string" },
+          "interaction_id": { "type": "string" },
+          "old_score": { "type": "number" },
+          "new_score": { "type": "number" },
+          "confidence": { "type": "number" },
+          "justification": { "type": "string" },
+          "metadata": { "type": "object" }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": { "type": "string" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "source",
+              "trait",
+              "delta",
+              "domain",
+              "cohort_id"
+            ],
+            "properties": {
+              "timestamp": { "type": "string", "format": "date-time" },
+              "source": { "type": "string" },
+              "trait": { "type": "string" },
+              "delta": { "type": "number" },
+              "domain": { "type": "string" },
+              "cohort_id": { "type": "string" },
+              "validator_id": { "type": "string" },
+              "dispute_id": { "type": "string" },
+              "interaction_id": { "type": "string" },
+              "old_score": { "type": "number" },
+              "new_score": { "type": "number" },
+              "confidence": { "type": "number" },
+              "justification": { "type": "string" },
+              "metadata": { "type": "object" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["version", "entries"],
+      "additionalProperties": false
+    }
+  ],
+  "examples": [
+    [
+      {
+        "timestamp": "2025-07-01T12:30:00Z",
+        "source": "peer_endorsement",
+        "trait": "integrity",
+        "delta": 0.02,
+        "domain": "law",
+        "cohort_id": "law-2025-Q3",
+        "validator_id": "did:validator:0xABC",
+        "interaction_id": "interaction-12345678",
+        "old_score": 0.89,
+        "new_score": 0.91,
+        "confidence": 0.95
+      }
+    ],
+    {
+      "version": "0.2.0",
+      "entries": [
+        {
+          "timestamp": "2025-07-01T12:30:00Z",
+          "source": "peer_endorsement",
+          "trait": "integrity",
+          "delta": 0.02,
+          "domain": "law",
+          "cohort_id": "law-2025-Q3",
+          "validator_id": "did:validator:0xABC",
+          "interaction_id": "interaction-12345678",
+          "old_score": 0.89,
+          "new_score": 0.91,
+          "confidence": 0.95
+        }
+      ]
+    }
+  ]
+}

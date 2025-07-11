@@ -1,6 +1,6 @@
-# DESTIN Protocol Specification -- Draft v0.1
+# DESTIN Protocol Specification -- Working Draft v0.2
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-v0.1-yellow.svg)](README.md)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-v0.2-yellow.svg)](README.md)
 
 ## TL;DR
 
@@ -626,7 +626,7 @@ Validators must be able to:
 - Certify score consistency and integrity
 - Flag or quarantine suspicious scoring events
 
-#### 5.7.4 Public vs Private Provenance
+##### 5.7.4 Public vs Private Provenance
 
 - By default, audit logs are permissioned but not public.
 - Public verifiability may be optionally supported via:
@@ -723,7 +723,71 @@ Every influence invocation (e.g., vote, decision input, score override) must be 
 - Input trait scores and weights
 - Final influence weight applied
 
-#### 6.4 Facilitator Role
+#### 6.3.1 Influence Calculation Pseudocode
+
+The following pseudocode details the step-by-step process for calculating agent influence under DWIP, incorporating ARF traits, domain trait weights, confidence (with decay), and CADM mode overrides. This is the canonical reference for all influence calculations in DESTIN (see also examples in 6.7 and Appendix 14.2).
+
+```plaintext
+Function calculateInfluence(agent, domainProfile, cadmMode, currentTime):
+    # agent: object with ARF trait scores and last-updated timestamps
+    # domainProfile: object with trait_weights (map of trait → weight)
+    # cadmMode: string, e.g. "resolution", "synthesis", "debate"
+    # currentTime: timestamp for decay/confidence calculation
+
+    # 1. Determine active trait weights
+    If cadmMode specifies trait weight overrides:
+        activeTraitWeights = merge(domainProfile.trait_weights, cadmMode.trait_weight_overrides)
+    Else:
+        activeTraitWeights = domainProfile.trait_weights
+
+    # 2. Select relevant traits
+    relevantTraits = keys(activeTraitWeights)
+
+    # 3. Initialize influence accumulator
+    totalInfluence = 0
+
+    # 4. For each relevant trait:
+    For trait in relevantTraits:
+        # a. Get agent's score for this trait (default to 0.5 if missing)
+        score = agent.traits.get(trait, 0.5)
+
+        # b. Get trait weight
+        weight = activeTraitWeights[trait]
+
+        # c. Calculate confidence (decay-adjusted)
+        lastUpdated = agent.traitTimestamps.get(trait, agent.createdAt)
+        deltaT = currentTime - lastUpdated
+        lambda = domainProfile.decayRates.get(trait, DEFAULT_LAMBDA)
+        stability = agent.traitStability.get(trait, 1.0)
+        confidence = exp(-lambda * deltaT) * stability
+
+        # d. Multiply components
+        traitInfluence = score * weight * confidence
+
+        # e. Add to total
+        totalInfluence += traitInfluence
+
+    # 5. (Optional) Normalize influence by cohort if required
+    # totalInfluence = normalize(totalInfluence, cohortStats)  # if normalization is protocol-mandated
+
+    # 6. Return result (optionally with breakdown for audit)
+    Return {
+        "influence": totalInfluence,
+        "breakdown": [
+            For each trait: {
+                "trait": trait,
+                "score": score,
+                "weight": weight,
+                "confidence": confidence,
+                "traitInfluence": traitInfluence
+            }
+        ]
+    }
+```
+
+This pseudocode is intended as a reference for implementers and protocol designers. It reflects the aggregation, weighting, and confidence adjustment rules described above, and is suitable for translation into code or further formalization.
+
+### 6.4 Facilitator Role
 
 In DWIP, facilitators are agents entrusted with coordination, arbitration, or moderation roles within domain-specific dialogue or task environments. These agents do not merely participate — they influence **process structure** and ensure protocol-aligned interactions.
 
@@ -1712,7 +1776,7 @@ Validation outcomes modify agent reputation as follows:
 
 ARF traits affected include: `integrity`, `consistency`, `verifiability`, `explainability`, and domain-specific vectors.
 
-Trait adjustments are bounded by the **Trust Elasticity Coefficient** (TEC), ensuring that no single validation event produces disproportionate reputation swings.
+Trait adjustments are bounded by the **Trust Elasticity Coefficient (TEC)**, ensuring that no single validation event produces disproportionate reputation swings.
 
 #### 8.6.2 DWIP Integration
 
@@ -2307,7 +2371,7 @@ DESTIN supports **configurable retention policies** and **state replay capabilit
 
 - Domains may define **retention windows** per event type (e.g., retain `score_update` logs for 1 year, `dispute_vote` logs indefinitely).
 - Logs may be **archived** (cold storage) or **pruned** with cryptographic commitments retained (e.g., Merkle root snapshots).
-- Protocol governance (see [Section 12](#12-risks-and-mitigation-strategies)) may enforce **minimum retention mandates** for high-risk domains.
+- Protocol governance (see [Section 12](#12-protocol-governance)) may enforce **minimum retention mandates** for high-risk domains.
 
 #### State Replay
 
