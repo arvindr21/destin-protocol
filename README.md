@@ -1,7 +1,7 @@
 # DESTIN Protocol
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.1.1-yellow.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-v0.2-yellow.svg)](package.json)
 
 **DESTIN** stands for _Decentralized Standard for Trust, Influence, and Negotiation_ — a universal protocol for multi-agent collaboration, reputation scoring, and conflict resolution in AI-driven systems.
 
@@ -40,9 +40,10 @@ DESTIN enables AI agents to build trust, prove reputation, and resolve disputes 
 
 ### Core Documentation
 
-- **[Protocol Specification](spec/destin-v0.1.md)**: Complete technical specification (v0.1)
+- **[Protocol Specification (v0.2)](spec/destin-v0.2.md)**: Complete technical specification (latest)
 - **[Design Principles](spec/design-principles.md)**: Core design philosophy and principles
 - **[Domain Tags](spec/domain-tags.md)**: Supported domain classifications and registry
+- **Legacy:** [Protocol Specification (v0.1)](spec/destin-v0.1.md)
 
 ### Data Structures & Schemas
 
@@ -70,7 +71,7 @@ DESTIN enables AI agents to build trust, prove reputation, and resolve disputes 
 
 ---
 
-## 🧪 Getting Started
+## 🧬 Getting Started
 
 ### Prerequisites
 
