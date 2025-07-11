@@ -2156,6 +2156,7 @@ Implementations should:
 The following process defines how to apply a score delta to an agent's ARF vector, supporting decay, domain scoping, and trait weighting. This logic is canonical for all ARF score updates and is suitable for translation into code (see also audit log replay in Section 9.6).
 
 **Inputs:**
+
 - `agent`: The agent object, including per-domain ARF trait vectors and last-updated timestamps
 - `domain`: The domain tag for the update (must be registered)
 - `trait`: The trait to update (e.g., "integrity")
@@ -2203,6 +2204,7 @@ The following process defines how to apply a score delta to an agent's ARF vecto
      - Any relevant cohort or validator context
 
 **Notes:**
+
 - This process is repeated for each score update event (e.g., feedback, arbitration, override).
 - To reconstruct score evolution, replay all audit log entries in order, applying this process for each.
 - Domain profiles may specify custom decay rates or trait weights for fine-grained control.
