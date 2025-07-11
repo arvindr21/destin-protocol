@@ -25,6 +25,7 @@ If no version is specified, the script defaults to `v0.1`.
 - `v0.2/` → `spec/destin-v0.2.md`
 
 Each versioned folder contains:
+
 - `schemas/` — JSON Schema definitions for that spec version
 - `samples/` — Example JSON files for that spec version
 - `README.md` — Details for that version
