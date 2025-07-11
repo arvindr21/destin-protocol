@@ -2151,6 +2151,62 @@ Implementations should:
 - Allow clients to **filter or weight scores** based on confidence or stability tolerances
 - Apply **differential privacy or obfuscation** mechanisms in sensitive domains (e.g., legal, health)
 
+### 9.2.1 Score Update Engine: Applying a Score Delta
+
+The following process defines how to apply a score delta to an agent's ARF vector, supporting decay, domain scoping, and trait weighting. This logic is canonical for all ARF score updates and is suitable for translation into code (see also audit log replay in Section 9.6).
+
+**Inputs:**
+- `agent`: The agent object, including per-domain ARF trait vectors and last-updated timestamps
+- `domain`: The domain tag for the update (must be registered)
+- `trait`: The trait to update (e.g., "integrity")
+- `delta`: The score change to apply (positive or negative)
+- `timestamp`: The time of the update (for decay calculation)
+- `domainProfile`: The domain profile object, including `trait_weights` and optional decay rates
+
+**Step-by-step process:**
+
+1. **Domain Scoping:**
+   - Ensure the agent has an ARF vector for the specified domain. If not, initialize all traits to the baseline (typically 0.5).
+
+2. **Decay Application:**
+   - For the target trait, compute the decayed score:
+     - Let `score_prev` be the previous score for the trait.
+     - Let `t_last` be the last-updated timestamp for this trait.
+     - Let `λ` be the decay rate for this trait (from domainProfile, or use default).
+     - Compute elapsed time: `Δt = timestamp - t_last` (in appropriate units).
+     - Apply exponential decay:
+       ```
+       score_decayed = score_prev × exp(-λ × Δt)
+       ```
+
+3. **Trait Weighting:**
+   - Retrieve the trait weight from the domain profile: `weight = domainProfile.trait_weights[trait]` (default to 1.0 if not specified).
+   - Compute the weighted delta: `delta_weighted = delta × weight`
+
+4. **Score Update:**
+   - Apply the weighted delta to the decayed score:
+     ```
+     score_new = score_decayed + delta_weighted
+     ```
+   - Clamp `score_new` to the allowed range (e.g., [0, 1]).
+
+5. **Update State:**
+   - Set the agent's trait score for this domain to `score_new`.
+   - Update the last-updated timestamp for this trait to `timestamp`.
+
+6. **Audit Logging:**
+   - Record the update in the audit log, including:
+     - Timestamp
+     - Source (event type, e.g., interaction, peer feedback)
+     - Trait, domain, delta applied
+     - Previous score, decayed score, new score
+     - Any relevant cohort or validator context
+
+**Notes:**
+- This process is repeated for each score update event (e.g., feedback, arbitration, override).
+- To reconstruct score evolution, replay all audit log entries in order, applying this process for each.
+- Domain profiles may specify custom decay rates or trait weights for fine-grained control.
+
 ## 10. Domain Classification and Dispute Resolution
 
 DESTIN relies on domain tagging to determine how agents interact, how their reputation is evaluated, and which dialogue mode (CADM) governs the exchange. This section outlines the formal process for classifying domains, resolving disagreements over classification, and adapting to evolving epistemic boundaries.
