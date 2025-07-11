@@ -2410,6 +2410,72 @@ If confidence voting fails to reach quorum, or if a resolution loop exceeds a pr
 
 Fallbacks are auditable and explicitly tagged as such in the **dispute ledger**, enabling downstream agents to treat fallback-derived decisions with **reduced or provisional trust**.
 
+### 10.6 Dispute Resolution Process as a Finite State Machine (FSM)
+
+The DESTIN dispute resolution process is formally modeled as a finite state machine (FSM) to ensure clarity, auditability, and protocol compliance. This FSM governs the lifecycle of disputes from initiation through evidence gathering, voting, escalation, council deliberation, appeals, and final resolution.
+
+#### 10.6.1 FSM States and Transitions
+
+The key states and transitions in the dispute resolution process are:
+
+- **Dispute Initiated**: A dispute is raised by an agent or system trigger.
+- **Evidence Aggregation**: Parties submit evidence and supporting materials.
+- **Peer Voting (Confidence Voting)**: The relevant cohort votes on the dispute using DWIP-weighted confidence voting (see 10.3).
+- **Quorum Achieved**: Sufficient votes and consensus are reached; an outcome is issued.
+- **Quorum Not Achieved**: Insufficient votes, tie, or timeout; triggers escalation.
+- **Escalation to Validator Council**: The dispute is escalated to a neutral validator or meta-agent council (see Section 8.4).
+- **Council Deliberation**: The council reviews evidence, deliberates, and votes.
+- **Council Verdict Issued**: The council issues a binding verdict.
+- **Appeal Window**: A time-limited window opens for eligible parties to submit an appeal.
+- **Appeal Submitted**: An appeal is formally submitted, meeting protocol criteria.
+- **Appeal Review**: The council (or a new quorum) reviews the appeal and evidence.
+- **Final Resolution**: The outcome is finalized and logged; the dispute is closed.
+
+#### 10.6.2 FSM Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> DisputeInitiated: Dispute raised
+    DisputeInitiated --> EvidenceAggregation: Submit evidence
+    EvidenceAggregation --> PeerVoting: Peer/Confidence voting
+    PeerVoting --> QuorumAchieved: Quorum reached
+    PeerVoting --> QuorumNotAchieved: Quorum not reached (timeout/insufficient votes)
+    QuorumAchieved --> ResolutionIssued: Outcome decided
+    QuorumNotAchieved --> Escalation: Escalate to validator council
+    Escalation --> CouncilDeliberation: Council reviews case
+    CouncilDeliberation --> CouncilVerdict: Council issues verdict
+    CouncilVerdict --> AppealWindow: Appeal window opens
+    ResolutionIssued --> AppealWindow: Appeal window opens
+    AppealWindow --> AppealSubmitted: Appeal submitted
+    AppealWindow --> [*]: No appeal (final)
+    AppealSubmitted --> AppealReview: Council reviews appeal
+    AppealReview --> FinalResolution: Final outcome issued
+    FinalResolution --> [*]: End
+    CouncilVerdict --> [*]: No appeal (final)
+    note right of PeerVoting: If tie or insufficient votes, escalate
+    note right of AppealWindow: Appeals must meet criteria and be timely
+    note right of Escalation: See Section 8.4 for council rules
+    note right of CouncilDeliberation: Quorum, timeouts, COI, override logic apply
+```
+
+#### 10.6.3 Rules for Quorum, Timeouts, and Appeals
+
+- **Quorum**: 
+  - Peer voting requires a minimum participation threshold (see 10.3). If not met, the dispute escalates.
+  - Validator councils must meet quorum rules as defined in Section 8.4 (e.g., minimum council size, ≥60% consensus, cohort diversity, service rotation).
+- **Timeouts**:
+  - Each phase (peer voting, council deliberation, appeal review) has a maximum time window (e.g., 24 hours for council verdicts; see Section 8.4.1).
+  - If timeouts are exceeded, fallback or override logic is triggered (see 10.5, 8.4.5).
+- **Appeals**:
+  - Appeals may be submitted by eligible parties within the defined window after a verdict (see Section 8.4.2–8.4.4).
+  - Appeals must include evidence and meet protocol criteria (e.g., material error, procedural violation).
+  - Appeals are reviewed by a new or rotated council, following the same quorum and deliberation rules.
+  - Limits and safeguards apply (e.g., cooldowns, rate limits, see Section 8.4.4).
+
+> For full details on council formation, eligibility, conflict of interest, override logic, and appeal lifecycle, see [Section 8.4](#84-escalation-and-appeal-processes).
+
+This FSM ensures that all dispute resolution events are auditable, time-bounded, and governed by transparent, protocol-enforced rules.
+
 ## 11. Ledger Architecture and Logging Mechanism
 
 DESTIN requires a transparent, tamper-evident system for recording key events such as score updates, disputes, domain changes, and agent actions. This section outlines a **hybrid ledger architecture** combining verifiable logging with flexible pluggability, without enforcing blockchain dependency.
