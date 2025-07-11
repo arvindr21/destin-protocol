@@ -725,13 +725,13 @@ Every influence invocation (e.g., vote, decision input, score override) must be 
 
 #### 6.3.1 Influence Calculation Pseudocode
 
-The following pseudocode details the step-by-step process for calculating agent influence under DWIP, incorporating ARF traits, domain trait weights, confidence (with decay), and CADM mode overrides. This is the canonical reference for all influence calculations in DESTIN (see also examples in 6.7 and Appendix 14.2).
+The following detailed pseudocode provides the canonical step-by-step process for calculating agent influence under DWIP, incorporating ARF traits, domain trait weights, confidence (with decay), and CADM mode overrides. This logic is suitable for translation into code and is aligned with the sample in `protocol-data/samples/dwip-influence-calculation.sample.json`. The output includes a full breakdown for auditability.
 
 ```plaintext
 Function calculateInfluence(agent, domainProfile, cadmMode, currentTime):
-    # agent: object with ARF trait scores and last-updated timestamps
-    # domainProfile: object with trait_weights (map of trait → weight)
-    # cadmMode: string, e.g. "resolution", "synthesis", "debate"
+    # agent: object with ARF trait scores, last-updated timestamps, and stability scores
+    # domainProfile: object with trait_weights (map of trait → weight), optional decayRates
+    # cadmMode: object or string; if present, may specify trait weight overrides
     # currentTime: timestamp for decay/confidence calculation
 
     # 1. Determine active trait weights
@@ -743,8 +743,9 @@ Function calculateInfluence(agent, domainProfile, cadmMode, currentTime):
     # 2. Select relevant traits
     relevantTraits = keys(activeTraitWeights)
 
-    # 3. Initialize influence accumulator
+    # 3. Initialize influence accumulator and breakdown
     totalInfluence = 0
+    breakdown = {}
 
     # 4. For each relevant trait:
     For trait in relevantTraits:
@@ -767,21 +768,21 @@ Function calculateInfluence(agent, domainProfile, cadmMode, currentTime):
         # e. Add to total
         totalInfluence += traitInfluence
 
+        # f. Record breakdown for audit
+        breakdown[trait] = {
+            "score": score,
+            "weight": weight,
+            "confidence": confidence,
+            "traitInfluence": traitInfluence
+        }
+
     # 5. (Optional) Normalize influence by cohort if required
     # totalInfluence = normalize(totalInfluence, cohortStats)  # if normalization is protocol-mandated
 
     # 6. Return result (optionally with breakdown for audit)
     Return {
         "influence": totalInfluence,
-        "breakdown": [
-            For each trait: {
-                "trait": trait,
-                "score": score,
-                "weight": weight,
-                "confidence": confidence,
-                "traitInfluence": traitInfluence
-            }
-        ]
+        "breakdown": breakdown
     }
 ```
 

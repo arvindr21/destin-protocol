@@ -21,10 +21,10 @@ This document contains a complete, actionable breakdown of all tasks in the DEST
 
 ### 3. DWIP Pseudocode
 
-- [ ] Write detailed pseudocode to calculate agent influence using DWIP rules.
-- [ ] Inputs: ARF traits, trait weights, confidence levels, CADM mode.
-- [ ] Output: `calculateInfluence(agent, domainProfile)` logic.
-- [ ] Sample exists in `samples/dwip-influence-calculation.sample.json`
+- [x] Write detailed pseudocode to calculate agent influence using DWIP rules.
+- [x] Inputs: ARF traits, trait weights, confidence levels, CADM mode.
+- [x] Output: `calculateInfluence(agent, domainProfile)` logic.
+- [x] Sample exists in `samples/dwip-influence-calculation.sample.json`
 
 ### 4. Conformance Tests
 
