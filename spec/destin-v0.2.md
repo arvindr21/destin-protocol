@@ -2460,7 +2460,7 @@ stateDiagram-v2
 
 #### 10.6.3 Rules for Quorum, Timeouts, and Appeals
 
-- **Quorum**: 
+- **Quorum**:
   - Peer voting requires a minimum participation threshold (see 10.3). If not met, the dispute escalates.
   - Validator councils must meet quorum rules as defined in Section 8.4 (e.g., minimum council size, ≥60% consensus, cohort diversity, service rotation).
 - **Timeouts**:
