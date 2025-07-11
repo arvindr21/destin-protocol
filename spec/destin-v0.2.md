@@ -2096,11 +2096,99 @@ Where:
 - \( t \) is the elapsed time since the last interaction affecting the trait
 - \( \lambda \) is the **decay rate coefficient**, tuned per domain and trait type
 
-#### Notes
+#### Sliding Window Decay
 
-- Traits with high **volatility** (e.g., `responsiveness`, `engagement`) should decay faster.
-- Traits that evolve slowly (e.g., `integrity`, `alignment`) may use slower decay or **decay only under inactivity**.
-- Protocol extensions may implement **custom decay policies** per CADM mode or based on agent roles.
+For some traits, a **sliding window decay** model is used to ensure that only recent activity within a defined window contributes to the current score. This is especially useful for high-volatility or rapidly changing domains.
+
+- **Window size** \( W \): The time interval (e.g., 30 days) over which events are considered.
+- **Score calculation**: Only events/interactions within the window \( [t-W, t] \) are included in the score computation; older events are ignored or downweighted.
+
+**Sliding Window Decay Pseudocode:**
+
+```plaintext
+function compute_sliding_window_score(events, window_size, now):
+    # events: list of (timestamp, delta) tuples, sorted by timestamp ascending
+    # window_size: duration (e.g., 30 days)
+    # now: current timestamp
+    score = baseline_score
+    for (timestamp, delta) in events:
+        if timestamp >= now - window_size:
+            score += delta
+    return score
+```
+
+- This logic can be combined with exponential decay for hybrid models.
+- Sliding window decay is recommended for traits where recency is critical (e.g., responsiveness, engagement).
+
+#### Decay Function Reuse
+
+> **Note:** Decay functions are reusable across traits, domains, and protocol modules. Implementers should define decay functions as modular components, allowing the same logic to be applied to ARF scoring, DWIP influence, and other time-sensitive metrics. This promotes consistency and simplifies protocol evolution.
+
+#### Volatility Metric Extension
+
+The ARF vector and agent schema are extended to include a **volatility metric** per trait or domain. Volatility measures the rate of change or variance in a trait score over a recent window, and can be used to:
+
+- Adjust decay rates dynamically
+- Flag unstable or erratic agents for audit
+- Inform normalization and influence calculations
+
+**Example ARF vector with volatility:**
+
+```json
+{
+  "domain": "law.arbitration",
+  "traits": {
+    "accuracy": { "score": 0.89, "volatility": 0.04 },
+    "civility": { "score": 0.93, "volatility": 0.01 },
+    "engagement": { "score": 0.76, "volatility": 0.1 }
+  }
+}
+```
+
+Volatility can be computed as the standard deviation or mean absolute change of recent score updates within a sliding window.
+
+---
+
+### 9.3.1 ARF Scoring with Decay: Pseudocode
+
+```plaintext
+function update_arf_score(prev_score, delta, last_update, now, lambda):
+    # Exponential decay
+    dt = now - last_update
+    decayed_score = prev_score * exp(-lambda * dt)
+    new_score = decayed_score + delta
+    return clamp(new_score, 0, 1)
+```
+
+- For sliding window decay, see pseudocode above.
+- For hybrid models, apply both decay and window filtering before updating.
+
+---
+
+### 9.5.1 Normalization: Pseudocode
+
+```plaintext
+function normalize_scores(scores, method):
+    # scores: list of raw trait scores for a cohort
+    # method: 'zscore', 'minmax', or 'quantile'
+    if method == 'zscore':
+        mu = mean(scores)
+        sigma = stddev(scores)
+        return [(s - mu) / sigma for s in scores]
+    elif method == 'minmax':
+        min_s = min(scores)
+        max_s = max(scores)
+        return [(s - min_s) / (max_s - min_s) for s in scores]
+    elif method == 'quantile':
+        # assign percentile ranks
+        sorted_scores = sorted(scores)
+        return [sorted_scores.index(s) / (len(scores) - 1) for s in scores]
+    else:
+        raise ValueError('Unknown normalization method')
+```
+
+- Normalization is always applied after decay and before aggregation or influence calculation.
+- Volatility metrics can be used to adjust normalization sensitivity or flag outliers.
 
 ### 9.4 Domain-Level Overrides
 
