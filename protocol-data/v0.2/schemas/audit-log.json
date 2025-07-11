@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://destin-protocol.org/schemas/audit-log.json",
   "title": "DESTIN Audit Log",
-  "description": "Schema for append-only audit logs of score updates, events, and provenance",
+  "description": "Schema for append-only audit logs of score updates, events, and provenance.",
   "version": "0.2.0",
   "oneOf": [
     {

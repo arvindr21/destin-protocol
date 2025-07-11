@@ -4,7 +4,7 @@
   "title": "DESTIN Domain Profile",
   "description": "Schema for domain-specific configuration including CADM modes and trait weights",
   "type": "object",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "required": ["domain", "default_modes", "trait_weights"],
   "properties": {
     "version": { "type": "string" },

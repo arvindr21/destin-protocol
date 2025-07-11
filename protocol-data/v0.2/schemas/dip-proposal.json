@@ -4,7 +4,7 @@
   "title": "DESTIN Improvement Proposal (DIP)",
   "description": "Schema for DESTIN Improvement Proposals that govern protocol evolution",
   "type": "object",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "required": [
     "dip_id",
     "title",

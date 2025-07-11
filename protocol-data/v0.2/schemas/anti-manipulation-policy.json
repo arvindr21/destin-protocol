@@ -4,7 +4,7 @@
   "title": "DESTIN Anti-Manipulation Policy",
   "description": "Schema for anti-manipulation policies that prevent gaming of the reputation system",
   "type": "object",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "required": [
     "influence_rate_limit",
     "confidence_weighting",

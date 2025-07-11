@@ -1892,6 +1892,93 @@ The Meta-Agent Validation Layer (MAVL), while foundational to DESTIN's trust inf
   - Flag domain drift events for audit
   - Use interaction-level trait inference to dynamically validate CADM tags
 
+### 8.4 Meta-Agent Council Election & Governance: Formal Specification
+
+#### 8.4.1 Council Election Rules
+- **Council Composition:** Councils are instantiated per dispute or protocol event, with a minimum size of 3 and an ideal size of 5–11 meta-agents, as determined by dispute complexity and domain activity.
+- **Quorum:** A decision requires ≥60% consensus of the council. If quorum is not reached within 24 hours, the session is marked as `undecided` and escalated to a reserve council.
+- **Diversity:** No more than 40% of council members may belong to the same cohort or trust region. Recency bias is prevented by limiting service to one council per agent per 7-day window.
+- **Timeouts & Fallback:** If a council fails to reach quorum or complete deliberation within the timeout window, a reserve council is instantiated. Repeated failures trigger a meta-audit of domain governance.
+
+#### 8.4.2 Eligibility Logic
+- **Eligibility Criteria:**
+  - ARF trait minimums: integrity ≥ 0.92, explainability ≥ 0.88, consistency ≥ 0.9 (across 50+ interactions), stability ≥ 0.95
+  - Domain depth: ≥0.9 relevance in at least one CADM-registered domain, ≥5 validated interactions in last 60 days
+  - Ledger health: No critical disputes overturned in last 120 days, no manipulation flags or quorum bias violations
+- **Eligibility Checking:**
+  - Eligibility is checked at nomination and before each council instantiation. Agents failing any criterion are excluded from the candidate pool.
+  - Eligibility status and reasons for exclusion are logged for auditability.
+
+#### 8.4.3 Meta-Agent Election Lifecycle
+
+```mermaid
+graph TD
+    A[Nomination] --> B[Eligibility Check]
+    B -- Pass --> C[Probation Period]
+    B -- Fail --> Z[Rejected]
+    C --> D[Validation Epoch]
+    D -- Pass --> E[Active Meta-Agent]
+    D -- Fail --> Z
+    E --> F[Council Assignment]
+    F --> G[Deliberation]
+    G --> H[Verdict]
+    H --> I[Rotation/Expiry]
+    I --> F
+    I --> J[Cooldown]
+    J --> K[Re-nomination]
+    Z --> L[Log Exclusion]
+```
+
+- **Phases:**
+  1. **Nomination:** Agent is nominated by DWIP vote, protocol trigger, or manual appeal.
+  2. **Eligibility Check:** All criteria in 8.4.2 are evaluated.
+  3. **Probation Period:** Initial 15-day limited-scope service.
+  4. **Validation Epoch:** Post-probation scoring reassessment.
+  5. **Active Meta-Agent:** Eligible for council assignment.
+  6. **Council Assignment:** Assigned to a council as needed.
+  7. **Deliberation:** Participates in council decision-making.
+  8. **Verdict:** Council issues a decision.
+  9. **Rotation/Expiry:** After max epochs or inactivity, agent rotates out.
+  10. **Cooldown:** Waiting period before re-nomination.
+  11. **Re-nomination:** Agent may be nominated again.
+  12. **Log Exclusion:** All failures/exclusions are logged.
+
+#### 8.4.4 Conflict of Interest (COI)
+- **Definition:** A conflict of interest occurs when a meta-agent has a direct or indirect stake in the outcome of a council decision, including prior involvement in the dispute, shared organizational ties, or recent collaboration with a party.
+- **Detection:**
+  - COI is detected via cohort analysis, ledger review, and agent self-declaration.
+  - Agents must declare known conflicts before council assignment. Undeclared COI discovered post-factum triggers audit and possible sanctions.
+- **Handling:**
+  - Agents with COI are excluded from the candidate pool for the relevant council.
+  - If COI is discovered during deliberation, the agent is replaced and the session may be re-evaluated.
+  - All COI events are logged for governance review.
+
+#### 8.4.5 Override Logic
+- **Triggers:**
+  - Failure to reach quorum or verdict within timeout
+  - Appeal or escalation by affected agent(s)
+  - Detection of bias, manipulation, or COI
+- **Process:**
+  1. **Escalation:** Event is escalated to a reserve council or higher governance tier.
+  2. **Override Session:** New council or governance body reviews evidence and prior deliberation.
+  3. **Outcome:** Override may uphold, reverse, or revise the original decision. All outcomes are logged with justification.
+- **Outcomes:**
+  - Override events are final unless further appeal is permitted by protocol rules.
+  - All override actions are auditable and must be referenced in the dispute ledger.
+
+#### 8.4.6 Forthcoming JSON Schemas
+The following JSON schemas will be provided to formalize these processes:
+- `meta-agent-council-election`
+- `meta-agent-eligibility`
+- `meta-agent-appeal`
+- `council-verdict`
+- `council-session`
+- `meta-agent-lifecycle`
+- `conflict-of-interest`
+- `council-override`
+
+These schemas will enable automated validation, auditability, and protocol compliance for all meta-agent governance events.
+
 ## 9. Scoring Logic and Normalization
 
 This section defines how agent reputation is calculated, updated, decayed, and normalized in DESTIN. It ensures that influence reflects recent, domain-specific behavior rather than static or global prestige.

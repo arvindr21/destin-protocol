@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destin-protocol.org/schemas/meta-agent-council-election.json",
+  "title": "Meta-Agent Council Election Event",
+  "description": "Schema for recording meta-agent council election events, including candidate pool, elected members, quorum, diversity, and election method as per DESTIN protocol governance.",
+  "version": "0.2.0",
+  "type": "object",
+  "required": [
+    "election_id",
+    "domain",
+    "council_size",
+    "candidate_pool",
+    "elected_members",
+    "quorum_threshold",
+    "diversity_check",
+    "election_method",
+    "start_time",
+    "end_time",
+    "status"
+  ],
+  "properties": {
+    "election_id": {
+      "type": "string",
+      "description": "Unique identifier for this council election event."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domain tag for which the council is being elected.",
+      "enum": [
+        "general", "law", "finance", "medicine", "education", "science", "governance", "negotiation", "news", "cooking", "home-automation", "commerce", "psychology", "arts", "ethics"
+      ]
+    },
+    "council_size": {
+      "type": "integer",
+      "minimum": 3,
+      "maximum": 15,
+      "description": "Number of meta-agents to be elected to the council."
+    },
+    "candidate_pool": {
+      "type": "array",
+      "description": "List of agent DIDs eligible for election.",
+      "items": {
+        "type": "string",
+        "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+      },
+      "minItems": 1
+    },
+    "elected_members": {
+      "type": "array",
+      "description": "List of agent DIDs elected to the council.",
+      "items": {
+        "type": "string",
+        "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+      },
+      "minItems": 3
+    },
+    "quorum_threshold": {
+      "type": "number",
+      "minimum": 0.5,
+      "maximum": 1.0,
+      "default": 0.6,
+      "description": "Fraction of council required for quorum (e.g., 0.6 = 60%)."
+    },
+    "diversity_check": {
+      "type": "object",
+      "description": "Diversity check results for the council.",
+      "required": ["cohort_counts", "pass"],
+      "properties": {
+        "cohort_counts": {
+          "type": "object",
+          "description": "Map of cohort/trust region to number of members in council.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "pass": {
+          "type": "boolean",
+          "description": "Whether the diversity rule (≤40% from any cohort) is satisfied."
+        }
+      }
+    },
+    "election_method": {
+      "type": "string",
+      "enum": ["dwip_vote", "protocol_trigger", "manual_appeal"],
+      "description": "How the council was elected."
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp for when the election started."
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp for when the election ended."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "completed", "failed"],
+      "description": "Status of the election event."
+    },
+    "reason_for_failure": {
+      "type": "string",
+      "description": "Reason for failure, if status is 'failed'."
+    },
+    "logs": {
+      "type": "array",
+      "description": "Log of election events.",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "event"],
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "event": { "type": "string" },
+          "agent_id": { "type": "string", "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$" },
+          "details": { "type": "string" }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional context-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "election_id": "election-20250701-001",
+      "domain": "governance",
+      "council_size": 5,
+      "candidate_pool": [
+        "did:peer:alpha", "did:peer:beta", "did:peer:gamma", "did:peer:delta", "did:peer:epsilon"
+      ],
+      "elected_members": [
+        "did:peer:alpha", "did:peer:beta", "did:peer:gamma", "did:peer:delta", "did:peer:epsilon"
+      ],
+      "quorum_threshold": 0.6,
+      "diversity_check": {
+        "cohort_counts": { "cohortA": 2, "cohortB": 2, "cohortC": 1 },
+        "pass": true
+      },
+      "election_method": "dwip_vote",
+      "start_time": "2025-07-01T12:00:00Z",
+      "end_time": "2025-07-01T12:05:00Z",
+      "status": "completed",
+      "logs": [
+        { "timestamp": "2025-07-01T12:00:01Z", "event": "nomination", "agent_id": "did:peer:alpha", "details": "Nominated by DWIP vote" },
+        { "timestamp": "2025-07-01T12:01:00Z", "event": "eligibility_check", "agent_id": "did:peer:beta", "details": "Passed all criteria" }
+      ],
+      "metadata": { "session_id": "session-20250701-01" }
+    }
+  ]
+} 

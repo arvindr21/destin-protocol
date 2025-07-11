@@ -4,7 +4,7 @@
   "title": "DESTIN Interoperability Export",
   "description": "Schema for signed reputation exports for cross-system interoperability",
   "type": "object",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "required": [
     "agent_id",
     "domain",
