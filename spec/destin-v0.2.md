@@ -1895,12 +1895,14 @@ The Meta-Agent Validation Layer (MAVL), while foundational to DESTIN's trust inf
 ### 8.4 Meta-Agent Council Election & Governance: Formal Specification
 
 #### 8.4.1 Council Election Rules
+
 - **Council Composition:** Councils are instantiated per dispute or protocol event, with a minimum size of 3 and an ideal size of 5–11 meta-agents, as determined by dispute complexity and domain activity.
 - **Quorum:** A decision requires ≥60% consensus of the council. If quorum is not reached within 24 hours, the session is marked as `undecided` and escalated to a reserve council.
 - **Diversity:** No more than 40% of council members may belong to the same cohort or trust region. Recency bias is prevented by limiting service to one council per agent per 7-day window.
 - **Timeouts & Fallback:** If a council fails to reach quorum or complete deliberation within the timeout window, a reserve council is instantiated. Repeated failures trigger a meta-audit of domain governance.
 
 #### 8.4.2 Eligibility Logic
+
 - **Eligibility Criteria:**
   - ARF trait minimums: integrity ≥ 0.92, explainability ≥ 0.88, consistency ≥ 0.9 (across 50+ interactions), stability ≥ 0.95
   - Domain depth: ≥0.9 relevance in at least one CADM-registered domain, ≥5 validated interactions in last 60 days
@@ -1944,6 +1946,7 @@ graph TD
   12. **Log Exclusion:** All failures/exclusions are logged.
 
 #### 8.4.4 Conflict of Interest (COI)
+
 - **Definition:** A conflict of interest occurs when a meta-agent has a direct or indirect stake in the outcome of a council decision, including prior involvement in the dispute, shared organizational ties, or recent collaboration with a party.
 - **Detection:**
   - COI is detected via cohort analysis, ledger review, and agent self-declaration.
@@ -1954,6 +1957,7 @@ graph TD
   - All COI events are logged for governance review.
 
 #### 8.4.5 Override Logic
+
 - **Triggers:**
   - Failure to reach quorum or verdict within timeout
   - Appeal or escalation by affected agent(s)
@@ -1967,7 +1971,9 @@ graph TD
   - All override actions are auditable and must be referenced in the dispute ledger.
 
 #### 8.4.6 Forthcoming JSON Schemas
+
 The following JSON schemas will be provided to formalize these processes:
+
 - `meta-agent-council-election`
 - `meta-agent-eligibility`
 - `meta-agent-appeal`

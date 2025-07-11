@@ -27,7 +27,21 @@
       "type": "string",
       "description": "Domain tag for which the council is being elected.",
       "enum": [
-        "general", "law", "finance", "medicine", "education", "science", "governance", "negotiation", "news", "cooking", "home-automation", "commerce", "psychology", "arts", "ethics"
+        "general",
+        "law",
+        "finance",
+        "medicine",
+        "education",
+        "science",
+        "governance",
+        "negotiation",
+        "news",
+        "cooking",
+        "home-automation",
+        "commerce",
+        "psychology",
+        "arts",
+        "ethics"
       ]
     },
     "council_size": {
@@ -110,7 +124,10 @@
         "properties": {
           "timestamp": { "type": "string", "format": "date-time" },
           "event": { "type": "string" },
-          "agent_id": { "type": "string", "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$" },
+          "agent_id": {
+            "type": "string",
+            "pattern": "^did:[a-z]+:[a-zA-Z0-9._-]+$"
+          },
           "details": { "type": "string" }
         }
       }
@@ -128,10 +145,18 @@
       "domain": "governance",
       "council_size": 5,
       "candidate_pool": [
-        "did:peer:alpha", "did:peer:beta", "did:peer:gamma", "did:peer:delta", "did:peer:epsilon"
+        "did:peer:alpha",
+        "did:peer:beta",
+        "did:peer:gamma",
+        "did:peer:delta",
+        "did:peer:epsilon"
       ],
       "elected_members": [
-        "did:peer:alpha", "did:peer:beta", "did:peer:gamma", "did:peer:delta", "did:peer:epsilon"
+        "did:peer:alpha",
+        "did:peer:beta",
+        "did:peer:gamma",
+        "did:peer:delta",
+        "did:peer:epsilon"
       ],
       "quorum_threshold": 0.6,
       "diversity_check": {
@@ -143,10 +168,20 @@
       "end_time": "2025-07-01T12:05:00Z",
       "status": "completed",
       "logs": [
-        { "timestamp": "2025-07-01T12:00:01Z", "event": "nomination", "agent_id": "did:peer:alpha", "details": "Nominated by DWIP vote" },
-        { "timestamp": "2025-07-01T12:01:00Z", "event": "eligibility_check", "agent_id": "did:peer:beta", "details": "Passed all criteria" }
+        {
+          "timestamp": "2025-07-01T12:00:01Z",
+          "event": "nomination",
+          "agent_id": "did:peer:alpha",
+          "details": "Nominated by DWIP vote"
+        },
+        {
+          "timestamp": "2025-07-01T12:01:00Z",
+          "event": "eligibility_check",
+          "agent_id": "did:peer:beta",
+          "details": "Passed all criteria"
+        }
       ],
       "metadata": { "session_id": "session-20250701-01" }
     }
   ]
-} 
+}
