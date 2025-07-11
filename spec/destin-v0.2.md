@@ -24,8 +24,9 @@ In short: DESTIN is the missing trust layer for the AI-driven world, combining m
 [10. Domain Classification and Dispute Resolution](#10-domain-classification-and-dispute-resolution)<br>
 [11. Ledger Architecture and Logging Mechanism](#11-ledger-architecture-and-logging-mechanism)<br>
 [12. Protocol Governance](#12-protocol-governance)<br>
-[13. Glossary of Terms](#13-glossary-of-terms)<br>
-[14. Appendix](#14-appendix)<br>
+[13. On-Chain vs Local Compute Models](#13-on-chain-vs-local-compute-models)<br>
+[14. Glossary of Terms](#14-glossary-of-terms)<br>
+[15. Appendix](#15-appendix)<br>
 
 ### The Problem: When AI Agents Run the World
 
@@ -2782,7 +2783,90 @@ All DIPs must include:
 
 This framework ensures DESTIN remains both **self-improving and externally accountable**, with minimal centralization and maximal protocol coherence.
 
-## 13. Glossary of Terms
+#### 12.6 Compliance Levels and Versioning Requirements
+
+DESTIN defines compliance levels for protocol implementers and specifies when protocol version bumps or formal governance actions are required.
+
+##### Compliance Levels
+
+| Level          | Description                                                                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reference**  | Implementation matches the official DESTIN reference implementation and passes all conformance tests.                                                                                       |
+| **Compatible** | Implementation adheres to all required protocol behaviors and data formats, but may use alternative libraries, languages, or optimizations. Must pass the compliance test suite.            |
+| **Full**       | Implementation supports all required and optional features, including advanced governance, audit, and extension hooks.                                                                      |
+| **Custom**     | Implementation deviates from the spec (e.g., custom traits, domain tags, or governance logic). Must clearly document all deviations and may not be interoperable with other DESTIN systems. |
+
+> See the [README](./README.md) for implementation guidance and compliance test suite details.
+
+##### Version Bump and Governance Action Triggers
+
+DESTIN uses [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH) for protocol and schema versions. The following changes require version bumps and/or formal governance actions:
+
+| Change Type                                                                                 | Version Bump   | Governance Action Required?    |
+| ------------------------------------------------------------------------------------------- | -------------- | ------------------------------ |
+| **Breaking change** (removes or alters required fields, protocol logic, or consensus rules) | MAJOR          | Yes (DIP + council vote)       |
+| **New required feature** (adds a required field, trait, or process)                         | MAJOR or MINOR | Yes (DIP + council vote)       |
+| **Backward-compatible extension** (optional fields, new domain tags, new CADM modes)        | MINOR          | Yes (DIP, may be fast-tracked) |
+| **Bug fix, clarifying text, or test update**                                                | PATCH          | No (editorial review only)     |
+| **Domain Tag Registry update** (new tag, scoring override)                                  | MINOR          | Yes (DIP, see domain-tags.md)  |
+| **Schema change** (core JSON schema update)                                                 | MAJOR or MINOR | Yes (DIP + schema review)      |
+| **Governance process change** (council rules, escalation logic)                             | MAJOR or MINOR | Yes (DIP + council vote)       |
+
+- **DIP**: DESTIN Improvement Proposal, required for all substantive protocol changes.
+- **Council vote**: Required for all breaking or consensus-impacting changes.
+- **Schema review**: Required for any change to core data formats.
+
+> Implementers must track the protocol version and ensure compatibility with the current spec. Nodes or agents running outdated or custom versions must clearly advertise their compliance level and supported version.
+
+This framework ensures that protocol evolution is transparent, auditable, and governed by the DESTIN community.
+
+## 13. On-Chain vs Local Compute Models
+
+DESTIN protocol components can be deployed using either on-chain (blockchain-based) or local (off-chain) compute models. Each approach offers distinct trade-offs in terms of trust, auditability, scalability, privacy, and operational cost. This section compares the two models and provides guidance for implementers.
+
+### 13.1 Definitions
+
+- **On-Chain Compute**: Protocol logic, scoring, and/or audit logs are executed and stored on a public or permissioned blockchain. All state transitions are validated by the chain's consensus mechanism.
+- **Local Compute**: Protocol logic and data are executed and stored off-chain, typically on a server, agent node, or within a private network. Audit logs and state may be anchored to a chain for verification, but primary computation is local.
+
+### 13.2 Comparison Table
+
+| Aspect            | On-Chain Compute                                        | Local Compute                        |
+| ----------------- | ------------------------------------------------------- | ------------------------------------ |
+| **Trust**         | Trustless, consensus-validated                          | Trust in local operator or validator |
+| **Auditability**  | Full, public, cryptographically verifiable              | Local logs, may anchor to chain      |
+| **Scalability**   | Limited by chain throughput, gas costs                  | High, limited by local resources     |
+| **Privacy**       | Public by default, privacy extensions needed            | Private by default, configurable     |
+| **Cost**          | Transaction/gas fees per operation                      | Minimal, local compute/storage costs |
+| **Latency**       | Block time delays, finality required                    | Near real-time, low latency          |
+| **Extensibility** | Protocol upgrades require chain governance              | Flexible, local upgrades possible    |
+| **Compliance**    | Easy to prove compliance, but may expose sensitive data | Flexible, but requires local audit   |
+
+### 13.3 Use Cases and Guidance
+
+- **On-Chain Compute is recommended when:**
+  - Maximum trustlessness and public verifiability are required (e.g., cross-organization arbitration, public reputation registries).
+  - Regulatory or compliance needs demand immutable, transparent logs.
+  - Protocol governance is managed by a decentralized community.
+
+- **Local Compute is recommended when:**
+  - Privacy, data protection, or low-latency requirements are paramount (e.g., enterprise deployments, sensitive domains).
+  - High throughput or custom logic is needed.
+  - The trust model allows for local validators or trusted execution environments.
+
+- **Hybrid Approaches:**
+  - Many DESTIN deployments may use local compute for most operations, with periodic anchoring of audit logs or state roots to a blockchain for verifiability (see Section 11, Ledger Architecture).
+  - Governance actions, protocol upgrades, or dispute resolutions can be selectively anchored or executed on-chain as needed.
+
+### 13.4 Protocol Implications
+
+- **Audit Log (Section 11):** On-chain storage maximizes auditability but increases cost and reduces privacy. Local logs can be anchored to a chain for proof of integrity.
+- **Governance (Section 12):** On-chain governance ensures transparency and community control, but may slow upgrades. Local governance is faster but requires trust in the operator.
+- **Compliance (Section 12.6):** On-chain deployments simplify compliance proofs but may conflict with privacy regulations. Local deployments offer more control but require robust audit mechanisms.
+
+> Implementers should select the compute model that best fits their trust, privacy, and operational requirements. DESTIN is designed to be agnostic and interoperable across both models.
+
+## 14. Glossary of Terms
 
 This glossary defines all key acronyms, components, and technologies referenced throughout the DESTIN specification.
 
@@ -2835,9 +2919,9 @@ This glossary defines all key acronyms, components, and technologies referenced 
 | **Collusion**            | Coordinated behavior between two or more agents to unfairly manipulate reputation, influence, or decision outcomes, often at the expense of protocol fairness.  |
 | **Reputation Gaming**    | Strategic manipulation of the reputation system by agents (individually or in groups) to artificially inflate scores, evade penalties, or gain undue influence. |
 
-## 14. Appendix
+## 15. Appendix
 
-### 14.1 Domain Tag Registry
+### 15.1 Domain Tag Registry
 
 The DESTIN protocol uses a controlled vocabulary of `domain_tags` to:
 
@@ -2860,11 +2944,11 @@ Agents may only declare tags from this registry. Validators must reject unknown 
 
 Future extensions to the registry must follow the [DESTIN Improvement Proposal (DIP)] process.
 
-### 14.2 DWIP Influence Example
+### 15.2 DWIP Influence Example
 
 This example illustrates how DWIP computes and applies influence in a real scenario, based on the rules defined in [6.3](#63-influence-rules).
 
-#### 14.2.1 Scenario: Legal Domain - Arbitration Panel Selection
+#### 15.2.1 Scenario: Legal Domain - Arbitration Panel Selection
 
 - **Domain**: `law`
 - **CADM Mode**: `arbitration`
@@ -2872,14 +2956,14 @@ This example illustrates how DWIP computes and applies influence in a real scena
 - **Candidate Agent ID**: `did:peer:1234abcd`
 - **Cohort**: `jurisdiction.us.central`
 
-#### 14.2.2 Step 1: Trait Scores (from Agent ARF vector)
+#### 15.2.2 Step 1: Trait Scores (from Agent ARF vector)
 
 | Trait            | Score | Last Updated | Stability Score |
 | ---------------- | ----- | ------------ | --------------- |
 | `integrity`      | 0.91  | 3 days ago   | 0.98            |
 | `explainability` | 0.86  | 1 day ago    | 0.94            |
 
-#### 14.2.3 Step 2: Domain Profile Weights
+#### 15.2.3 Step 2: Domain Profile Weights
 
 ```json
 "trait_weights": {
@@ -2888,7 +2972,7 @@ This example illustrates how DWIP computes and applies influence in a real scena
 }
 ```
 
-#### 14.2.4 Step 3: Confidence Calculation
+#### 15.2.4 Step 3: Confidence Calculation
 
 Using decay function:
 
@@ -2901,7 +2985,7 @@ Assuming λ = 0.1:
 - `integrity`: exp(-0.1×3) × 0.98 ≈ 0.73 × 0.98 ≈ **0.715**
 - `explainability`: exp(-0.1×1) × 0.94 ≈ 0.90 × 0.94 ≈ **0.846**
 
-#### 14.2.5 Step 4: Influence Calculation
+#### 15.2.5 Step 4: Influence Calculation
 
 ```
 influence_weight = Σ (trait_score × trait_weight × confidence)
@@ -2912,7 +2996,7 @@ influence_weight = Σ (trait_score × trait_weight × confidence)
 
 **Total Influence Weight = 0.78 + 0.80 = 1.58**
 
-#### 14.2.6 Step 5: Apply Rules
+#### 15.2.6 Step 5: Apply Rules
 
 - **Normalization Rule**: Influence is within cohort bounds ✅
 - **Decay Rule**: Scores have decay factored in ✅
@@ -2922,11 +3006,11 @@ influence_weight = Σ (trait_score × trait_weight × confidence)
 - **Eligibility Threshold**: Arbitration requires ≥1.50 → Agent qualifies ✅
 - **Logging Rule**: Log entry created with full computation trace ✅
 
-#### 14.2.7 Final Outcome
+#### 15.2.7 Final Outcome
 
 Agent `did:peer:1234abcd` is **eligible and selected** as a weighted contributor in an arbitration task, carrying an influence weight of **1.58**, applied proportionally in outcome aggregation.
 
-### 14.3 Sample JSON Files
+### 15.3 Sample JSON Files
 
 The following sample files provide concrete examples of DESTIN protocol data structures and policies:
 
