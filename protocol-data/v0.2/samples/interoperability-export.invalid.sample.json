@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "domain": "law",
+  "timestamp": "2025-06-30T12:00:00Z",
+  "reputation_vector": "should be an object",
+  "signature": 12345,
+  "signature_algorithm": "invalid_algo",
+  "public_key": "z6Mki3a9Nxyz5g7Lp8bZTqR2uFyJ4Kv6WsUdo4XvE2bHjRkA",
+  "exporting_system": "destin-validator-v1",
+  "exporting_validator": "did:validator:0xABC",
+  "confidence_scores": {
+    "integrity": 1.5
+  },
+  "stability_scores": {
+    "integrity": 0.98
+  },
+  "last_updated": "2025-06-29T15:30:00Z",
+  "cohort_context": "law-2025-Q2",
+  "metadata": {
+    "protocol_version": "v0.1"
+  },
+  "extra_field": "not allowed"
+} 

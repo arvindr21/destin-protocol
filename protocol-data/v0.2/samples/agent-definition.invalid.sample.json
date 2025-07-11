@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "public_key": 12345,
+  "display_name": "agent.alpha.protocol",
+  "namespace_aliases": {
+    "chatnet": "did:chatnet:xyz456"
+  },
+  "metadata": {
+    "agent_type": "domain-specialist",
+    "domain_tags": ["invalid_domain"],
+    "created_at": "2025-06-01T12:00:00Z"
+  },
+  "reputation": {
+    "law": {
+      "integrity": 0.91
+    }
+  },
+  "extra_field": "not allowed"
+} 

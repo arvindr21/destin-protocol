@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "confidence_weighting": "yes",
+  "trust_radius": {
+    "min_reputation_threshold": "low",
+    "shared_domain_required": true
+  },
+  "anomaly_detection": "score_spikes",
+  "behavioral_throttling": {
+    "max_score_delta_per_day": 0.1
+  },
+  "challenge_and_prove": {
+    "enabled": true
+  },
+  "audit_trails": {
+    "log_all_score_changes": true
+  },
+  "extra_field": "not allowed"
+} 

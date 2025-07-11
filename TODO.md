@@ -28,9 +28,9 @@ This document contains a complete, actionable breakdown of all tasks in the DEST
 
 ### 4. Conformance Tests
 
-- [ ] Extend `validate-samples.js` to run a full conformance test suite.
-- [ ] Include: valid/invalid agent definitions, domain profiles, DWIP calculations.
-- [ ] Add CI test badge + instructions in `protocol-data/README.md`
+- [x] Extend `validate-samples.js` to run a full conformance test suite.
+- [x] Include: valid/invalid agent definitions, domain profiles, DWIP calculations.
+- [x] Add CI test badge + instructions in `protocol-data/README.md`
 
 ---
 

@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "title": "Add New Domain Tag for Healthcare",
+  "rationale": "The protocol needs to support healthcare-specific agent interactions and scoring.",
+  "proposed_changes": "should be an array",
+  "impact_analysis": {
+    "arf_impact": "low"
+  },
+  "author": "did:peer:proposer123",
+  "timestamp": "2025-07-15T10:00:00Z",
+  "status": "pending",
+  "voting_results": {
+    "total_votes": 7
+  },
+  "activation_window": {
+    "proposed_activation": "2025-08-01T00:00:00Z"
+  },
+  "extra_field": "not allowed"
+} 

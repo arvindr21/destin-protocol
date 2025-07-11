@@ -14,12 +14,34 @@ const path = require('path');
 const Ajv = require('ajv/dist/2020').default;
 const addFormats = require('ajv-formats');
 
+const protocolDataDir = __dirname;
+function getLatestVersionDir() {
+  const versionDirs = fs.readdirSync(protocolDataDir)
+    .filter(name => /^v\d+\.\d+/.test(name));
+  if (versionDirs.length === 0) return 'v0.1';
+  // Sort using semantic versioning
+  versionDirs.sort((a, b) => {
+    const pa = a.replace('v', '').split('.').map(Number);
+    const pb = b.replace('v', '').split('.').map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const na = pa[i] || 0;
+      const nb = pb[i] || 0;
+      if (na !== nb) return na - nb;
+    }
+    return 0;
+  });
+  return versionDirs[versionDirs.length - 1];
+}
+
 // Parse version argument
 const argv = process.argv;
-let version = 'v0.1';
+let version;
 const versionArgIndex = argv.findIndex(arg => arg === '--version');
 if (versionArgIndex !== -1 && argv[versionArgIndex + 1]) {
   version = argv[versionArgIndex + 1];
+} else {
+  version = getLatestVersionDir();
+  console.log(`\x1b[33m[info]\x1b[0m No --version specified. Auto-selected latest version: ${version}`);
 }
 
 const baseDir = path.join(__dirname, version);
@@ -59,28 +81,31 @@ function discoverSamples() {
     log(`Samples directory not found: ${samplesDir}`, colors.red);
     process.exit(1);
   }
-  const sampleFiles = fs.readdirSync(samplesDir)
-    .filter(file => file.endsWith('.sample.json'))
-    .map(file => file.replace('.sample.json', ''));
-
-  return sampleFiles;
+  // Discover both valid and invalid samples
+  const allFiles = fs.readdirSync(samplesDir);
+  const validSamples = allFiles.filter(file => file.endsWith('.sample.json') && !file.endsWith('.invalid.sample.json'));
+  const invalidSamples = allFiles.filter(file => file.endsWith('.invalid.sample.json'));
+  return { validSamples, invalidSamples };
 }
 
 function mapSampleToSchema(sampleName) {
+  // Remove .invalid if present
+  const baseName = sampleName.replace('.invalid', '');
   // Handle special cases where multiple samples use the same schema
   const specialMappings = {
     'domain-profile.law': 'domain-profile',
     'domain-profile.governance': 'domain-profile',
     'audit-log.did_peer_1234abcd': 'audit-log',
-    'interoperability-export.did_peer_1234abcd': 'interoperability-export'
+    'interoperability-export.did_peer_1234abcd': 'interoperability-export',
+    'domain-profile': 'domain-profile',
+    'audit-log': 'audit-log',
+    'interoperability-export': 'interoperability-export'
   };
-
-  if (specialMappings[sampleName]) {
-    return specialMappings[sampleName];
+  if (specialMappings[baseName]) {
+    return specialMappings[baseName];
   }
-
   // Default mapping: sample name maps to schema name
-  return sampleName;
+  return baseName;
 }
 
 function loadSchema(schemaFile) {
@@ -141,7 +166,8 @@ function main() {
   log(`Version: ${version}\n`, colors.yellow);
 
   // Discover all sample files
-  const sampleFiles = discoverSamples();
+  const { validSamples, invalidSamples } = discoverSamples();
+  const sampleFiles = [...validSamples, ...invalidSamples];
 
   if (sampleFiles.length === 0) {
     log('⚠️  No sample files found in samples/ directory', colors.yellow);
@@ -149,41 +175,64 @@ function main() {
   }
 
   log(`📁 Found ${sampleFiles.length} sample files:`, colors.blue);
-  sampleFiles.forEach(file => log(`   - ${file}.sample.json`, colors.blue));
+  sampleFiles.forEach(file => log(`   - ${file}`, colors.blue));
   log('');
 
   const results = [];
   let totalSamples = 0;
-  let validSamples = 0;
+  let validSamplesCount = 0;
+  let invalidSamplesCount = 0;
+  let falsePositives = 0;
+  let falseNegatives = 0;
 
-  for (const sampleFile of sampleFiles) {
+  // Validate valid samples (should PASS)
+  for (const file of validSamples) {
     totalSamples++;
-    const schemaFile = mapSampleToSchema(sampleFile);
-
-    log(`Validating ${sampleFile}.sample.json against ${schemaFile}.json...`, colors.yellow);
-
-    const result = validateSample(sampleFile, schemaFile);
-    results.push({ sampleFile, schemaFile, ...result });
-
+    const sampleName = file.replace('.sample.json', '');
+    const schemaFile = mapSampleToSchema(sampleName);
+    log(`Validating (should PASS) ${file} against ${schemaFile}.json...`, colors.yellow);
+    const result = validateSample(sampleName, schemaFile);
+    results.push({ file, schemaFile, expected: 'valid', ...result });
     if (result.valid) {
-      validSamples++;
+      validSamplesCount++;
+    } else {
+      falseNegatives++;
+      log(`❌ False negative: ${file} should be valid but failed validation.`, colors.red);
     }
+    log('');
+  }
 
-    log(''); // Empty line for readability
+  // Validate invalid samples (should FAIL)
+  for (const file of invalidSamples) {
+    totalSamples++;
+    const sampleName = file.replace('.invalid.sample.json', '');
+    const schemaFile = mapSampleToSchema(sampleName);
+    log(`Validating (should FAIL) ${file} against ${schemaFile}.json...`, colors.yellow);
+    const result = validateSample(sampleName + '.invalid', schemaFile);
+    results.push({ file, schemaFile, expected: 'invalid', ...result });
+    if (!result.valid) {
+      invalidSamplesCount++;
+    } else {
+      falsePositives++;
+      log(`❌ False positive: ${file} should be invalid but passed validation.`, colors.red);
+    }
+    log('');
   }
 
   // Summary
   log('📊 Validation Summary', colors.bold + colors.blue);
   log('====================', colors.blue);
   log(`Total samples: ${totalSamples}`, colors.blue);
-  log(`Valid samples: ${validSamples}`, colors.green);
-  log(`Invalid samples: ${totalSamples - validSamples}`, colors.red);
+  log(`Valid samples (expected pass): ${validSamplesCount}`, colors.green);
+  log(`Invalid samples (expected fail): ${invalidSamplesCount}`, colors.green);
+  log(`False positives (invalid but passed): ${falsePositives}`, colors.red);
+  log(`False negatives (valid but failed): ${falseNegatives}`, colors.red);
 
-  if (validSamples === totalSamples) {
-    log('\n🎉 All samples are valid!', colors.bold + colors.green);
+  if (falsePositives === 0 && falseNegatives === 0) {
+    log('\n🎉 All samples behaved as expected!', colors.bold + colors.green);
     process.exit(0);
   } else {
-    log('\n⚠️  Some samples have validation errors. Please fix them.', colors.bold + colors.yellow);
+    log('\n⚠️  Some samples did not behave as expected. Please review errors above.', colors.bold + colors.yellow);
     process.exit(1);
   }
 }

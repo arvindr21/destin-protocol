@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "default_modes": "resolution",
+  "trait_weights": 1.5,
+  "scoring_modifiers": {
+    "trust_thresholds": {
+      "facilitator": 0.8
+    }
+  },
+  "volatility_score": 2.5,
+  "extra_field": "not allowed"
+} 

@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "domain": "governance",
+  "cadm_mode": "synthesis",
+  "influence_score": "high",
+  "timestamp": "2025-07-15T09:31:00Z",
+  "trait_scores": {
+    "civility": 1.5
+  },
+  "trait_weights": {
+    "civility": 1.3
+  },
+  "confidence_factors": {
+    "civility": 0.88
+  },
+  "normalization_method": "invalid_method",
+  "decay_applied": true,
+  "decay_factor": 0.9,
+  "extra_field": "not allowed"
+} 
