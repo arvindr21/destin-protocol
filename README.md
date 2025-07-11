@@ -36,6 +36,40 @@ DESTIN enables AI agents to build trust, prove reputation, and resolve disputes 
 
 ---
 
+## 📚 Documentation
+
+### Core Documentation
+
+- **[Protocol Specification](spec/destin-v0.1.md)**: Complete technical specification (v0.1)
+- **[Design Principles](spec/design-principles.md)**: Core design philosophy and principles
+- **[Domain Tags](spec/domain-tags.md)**: Supported domain classifications and registry
+
+### Data Structures & Schemas
+
+- **[JSON Schemas](protocol-data/v0.2/schemas/)**: Complete schema definitions for all protocol components
+  - [Agent Definition](protocol-data/v0.2/schemas/agent-definition.json)
+  - [Domain Profile](protocol-data/v0.2/schemas/domain-profile.json)
+  - [DWIP Influence Calculation](protocol-data/v0.2/schemas/dwip-influence-calculation.json)
+  - [CADM Mode Selection](protocol-data/v0.2/schemas/cadm-mode-selection.json)
+  - [Audit Log](protocol-data/v0.2/schemas/audit-log.json)
+  - [DIP Proposal](protocol-data/v0.2/schemas/dip-proposal.json)
+  - [Anti-Manipulation Policy](protocol-data/v0.2/schemas/anti-manipulation-policy.json)
+  - [Interoperability Export](protocol-data/v0.2/schemas/interoperability-export.json)
+
+- **[Sample Data](protocol-data/v0.2/samples/)**: Example implementations for all protocol components
+  - [Agent Definition Sample](protocol-data/v0.2/samples/agent-definition.sample.json)
+  - [Domain Profile Samples](protocol-data/v0.2/samples/domain-profile.*.sample.json)
+  - [DWIP Calculation Sample](protocol-data/v0.2/samples/dwip-influence-calculation.sample.json)
+  - [CADM Mode Sample](protocol-data/v0.2/samples/cadm-mode-selection.sample.json)
+  - [Audit Log Sample](protocol-data/v0.2/samples/audit-log.did_peer_1234abcd.sample.json)
+
+### Validation Tools
+
+- **[Schema Validation](protocol-data/validate-schemas.js)**: Validate JSON schema integrity
+- **[Sample Validation](protocol-data/validate-samples.js)**: Validate sample data against schemas
+
+---
+
 ## 🧪 Getting Started
 
 ### Prerequisites
@@ -87,40 +121,6 @@ ls protocol-data/samples/domain-profile.*.sample.json
 # Validate all samples against schemas
 npm run validate-samples
 ```
-
----
-
-## 📚 Documentation
-
-### Core Documentation
-
-- **[Protocol Specification](spec/destin-v0.1.md)**: Complete technical specification (v0.1)
-- **[Design Principles](spec/design-principles.md)**: Core design philosophy and principles
-- **[Domain Tags](spec/domain-tags.md)**: Supported domain classifications and registry
-
-### Data Structures & Schemas
-
-- **[JSON Schemas](protocol-data/schemas/)**: Complete schema definitions for all protocol components
-  - [Agent Definition](protocol-data/schemas/agent-definition.json)
-  - [Domain Profile](protocol-data/schemas/domain-profile.json)
-  - [DWIP Influence Calculation](protocol-data/schemas/dwip-influence-calculation.json)
-  - [CADM Mode Selection](protocol-data/schemas/cadm-mode-selection.json)
-  - [Audit Log](protocol-data/schemas/audit-log.json)
-  - [DIP Proposal](protocol-data/schemas/dip-proposal.json)
-  - [Anti-Manipulation Policy](protocol-data/schemas/anti-manipulation-policy.json)
-  - [Interoperability Export](protocol-data/schemas/interoperability-export.json)
-
-- **[Sample Data](protocol-data/samples/)**: Example implementations for all protocol components
-  - [Agent Definition Sample](protocol-data/samples/agent-definition.sample.json)
-  - [Domain Profile Samples](protocol-data/samples/domain-profile.*.sample.json)
-  - [DWIP Calculation Sample](protocol-data/samples/dwip-influence-calculation.sample.json)
-  - [CADM Mode Sample](protocol-data/samples/cadm-mode-selection.sample.json)
-  - [Audit Log Sample](protocol-data/samples/audit-log.did_peer_1234abcd.sample.json)
-
-### Validation Tools
-
-- **[Schema Validation](protocol-data/validate-schemas.js)**: Validate JSON schema integrity
-- **[Sample Validation](protocol-data/validate-samples.js)**: Validate sample data against schemas
 
 ---
 
