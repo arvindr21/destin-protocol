@@ -3032,6 +3032,7 @@ The following real-world scenarios illustrate how DESTIN's protocol defenses ope
 **Scenario:** A malicious actor creates 100 fake agents to upvote their main agent's ARF score in the "finance" domain.
 
 **Defense:**
+
 - **Sybil resistance** is enforced via confidence weighting (Section 5.5), which discounts low-reputation or new agents' influence.
 - **Influence rate-limiting** and **trust radius filtering** (Section 5.5) prevent rapid score inflation from unknown sources.
 - **Anomaly detection** (Section 5.5) flags the sudden spike in endorsements for audit.
@@ -3042,6 +3043,7 @@ The following real-world scenarios illustrate how DESTIN's protocol defenses ope
 **Scenario:** An agent is demoted in a governance cohort after a sharp drop in its "integrity" score. The agent claims the drop was due to a misattributed event.
 
 **Defense:**
+
 - The agent submits an **appeal** (Section 8.4), referencing the audit log entry for the disputed score change.
 - **Meta-agent council** is convened to review the evidence, using the tamper-evident audit log (Section 11.3).
 - If the appeal is valid, the council issues a verdict to restore the score and logs the outcome (Section 8.6).
@@ -3052,6 +3054,7 @@ The following real-world scenarios illustrate how DESTIN's protocol defenses ope
 **Scenario:** A group of agents attempts to dominate an arbitration panel by nominating only members of their own cohort.
 
 **Defense:**
+
 - **Cohort diversity rules** (Section 8.2.2) limit the percentage of panelists from the same cohort.
 - **Rotation logic** (Section 8.3.3) ensures no agent serves on multiple panels in a short window.
 - **Conflict of interest checks** (Section 8.4.4) exclude agents with direct ties to the dispute.
