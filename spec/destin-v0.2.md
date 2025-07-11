@@ -2524,7 +2524,13 @@ Domain registrars and protocol nodes must expose a **capabilities manifest** des
 
 ### 11.3 Event Log Taxonomy
 
-All ledger entries are stored as structured, versioned, and typed events. DESTIN defines a standard **event taxonomy** to ensure interpretability and cross-domain auditability.
+DESTIN's event log is designed for maximum auditability, tamper-evidence, and cryptographic integrity. To achieve this, each event record includes:
+
+- **Merkle root chaining**: Every event includes a `merkle_root` field representing the Merkle root of the log after the event is added, and a `previous_merkle_root` (or hash pointer) referencing the prior root. This enables efficient verification of log integrity and supports cryptographic proofs of inclusion.
+- **Event IDs with hash pointers**: Each event has a unique `event_id`, a `hash` field (cryptographic hash of the event), and a `previous_hash` field pointing to the hash of the previous event. This forms a hash-linked chain for tamper detection and log replay.
+- **Validator signature support**: In addition to the event submitter's signature, each event may include a `validator_signatures` array containing digital signatures from validators or meta-agents who have attested to or validated the event. This supports multi-party attestation and protocol-level trust.
+
+These features ensure that the audit log is cryptographically anchored, supports efficient verification, and enables robust dispute resolution and compliance auditing.
 
 #### Event Types
 
@@ -2550,15 +2556,26 @@ All ledger entries are stored as structured, versioned, and typed events. DESTIN
   "new_score": 0.84,
   "source": "peer.feedback",
   "timestamp": "2025-06-23T14:02:00Z",
-  "signature": "0xdeadbeef...",
-  "hash": "b6a3...4d"
+  "signature": "0xdeadbeef...", // submitter's signature
+  "validator_signatures": ["0xvalsig1...", "0xvalsig2..."],
+  "hash": "b6a3...4d", // hash of this event
+  "previous_hash": "a1b2...c3d", // hash pointer to previous event
+  "merkle_root": "mroot123...", // Merkle root after this event
+  "previous_merkle_root": "mroot122..." // Merkle root before this event
 }
 ```
 
+- `event_id`: Unique identifier for the event (e.g., UUID or monotonic sequence)
+- `hash`/`previous_hash`: Cryptographically links events for tamper-evidence
+- `merkle_root`/`previous_merkle_root`: Enables efficient proof of inclusion and log integrity
+- `validator_signatures`: Array of digital signatures from validators or meta-agents attesting to the event
+- `signature`: Signature of the event submitter (agent or system)
+
 #### Notes
 
-- Events are **cryptographically signed** and **hash-linked** for tamper evidence.
+- Events are **cryptographically signed**, **hash-linked**, and **Merkle-chained** for tamper evidence and efficient auditability.
 - All fields are versioned and forward-compatible for protocol evolution.
+- Log consumers MUST verify hash chains, Merkle roots, and validator signatures to ensure log integrity and trust.
 
 ### 11.4 Pluggable Backends
 
